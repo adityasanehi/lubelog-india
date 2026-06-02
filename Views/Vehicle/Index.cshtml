@@ -24,6 +24,8 @@
     <script src="~/js/odometerrecord.js?v=@StaticHelper.VersionNumber"></script>
     <script src="~/js/inspectionrecord.js?v=@StaticHelper.VersionNumber"></script>
     <script src="~/js/equipmentrecord.js?v=@StaticHelper.VersionNumber"></script>
+    <script src="~/js/insurancerecord.js?v=@StaticHelper.VersionNumber"></script>
+    <script src="~/js/pucrecord.js?v=@StaticHelper.VersionNumber"></script>
     <script src="~/lib/chart-js/chart.umd.js"></script>
     <script src="~/lib/drawdown/drawdown.js"></script>
     <script src="~/lib/qrcode/qrcode.js"></script>
@@ -80,6 +82,18 @@
                     <li class="nav-item" role="presentation" style="order: @userConfig.TabOrder.FindIndex(x=>x == ImportMode.ReminderRecord)">
                         <button class="nav-link resizable-nav-link @StaticHelper.DefaultActiveTab(userConfig, ImportMode.ReminderRecord)" id="reminder-tab" data-bs-toggle="tab" data-bs-target="#reminder-tab-pane" type="button" role="tab" aria-selected="false"><div class="reminderBellDiv" style="display:inline-flex;"><i class="reminderBell bi bi-bell"></i></div><span class="ms-2">@translator.Translate(userLanguage, "Reminders")</span></button>
                     </li>
+                    @if (userConfig.VisibleTabs.Contains(ImportMode.InsuranceRecord))
+                    {
+                    <li class="nav-item" role="presentation" style="order: @userConfig.TabOrder.FindIndex(x=>x == ImportMode.InsuranceRecord)">
+                        <button class="nav-link resizable-nav-link @StaticHelper.DefaultActiveTab(userConfig, ImportMode.InsuranceRecord)" id="insurance-tab" data-bs-toggle="tab" data-bs-target="#insurance-tab-pane" type="button" role="tab" aria-selected="false"><i class="bi bi-shield-check"></i><span class="ms-2">@translator.Translate(userLanguage, "Insurance")</span></button>
+                    </li>
+                    }
+                    @if (userConfig.VisibleTabs.Contains(ImportMode.PUCRecord))
+                    {
+                    <li class="nav-item" role="presentation" style="order: @userConfig.TabOrder.FindIndex(x=>x == ImportMode.PUCRecord)">
+                        <button class="nav-link resizable-nav-link @StaticHelper.DefaultActiveTab(userConfig, ImportMode.PUCRecord)" id="puc-tab" data-bs-toggle="tab" data-bs-target="#puc-tab-pane" type="button" role="tab" aria-selected="false"><i class="bi bi-cloud-check"></i><span class="ms-2">@translator.Translate(userLanguage, "PUC")</span></button>
+                    </li>
+                    }
                     <li class="nav-item" role="presentation" style="order: @(userConfig.TabOrder.Count + 1)">
                         <button class="nav-link resizable-nav-link" type="button" role="tab" aria-selected="false" id="search-tab" onclick="showGlobalSearch()"><i class="bi bi-search"></i><span class="ms-2 ">@translator.Translate(userLanguage, "Search")</span></button>
                     </li>
@@ -125,6 +139,18 @@
                             <li class="nav-item text-truncate" role="presentation" style="order: @userConfig.TabOrder.FindIndex(x => x == ImportMode.ReminderRecord)">
                                 <button class="nav-link resizable-nav-link @StaticHelper.DefaultActiveTab(userConfig, ImportMode.ReminderRecord)" id="reminder-tab" data-bs-toggle="tab" data-bs-target="#reminder-tab-pane" type="button" role="tab" aria-selected="false"><div class="reminderBellDiv" style="display:inline-flex;"><i class="reminderBell bi bi-bell"></i></div><span class="ms-2">@translator.Translate(userLanguage, "Reminders")</span></button>
                             </li>
+                            @if (userConfig.VisibleTabs.Contains(ImportMode.InsuranceRecord))
+                            {
+                            <li class="nav-item text-truncate" role="presentation" style="order: @userConfig.TabOrder.FindIndex(x => x == ImportMode.InsuranceRecord)">
+                                <button class="nav-link resizable-nav-link @StaticHelper.DefaultActiveTab(userConfig, ImportMode.InsuranceRecord)" id="insurance-tab" data-bs-toggle="tab" data-bs-target="#insurance-tab-pane" type="button" role="tab" aria-selected="false"><i class="bi bi-shield-check"></i><span class="ms-2">@translator.Translate(userLanguage, "Insurance")</span></button>
+                            </li>
+                            }
+                            @if (userConfig.VisibleTabs.Contains(ImportMode.PUCRecord))
+                            {
+                            <li class="nav-item text-truncate" role="presentation" style="order: @userConfig.TabOrder.FindIndex(x => x == ImportMode.PUCRecord)">
+                                <button class="nav-link resizable-nav-link @StaticHelper.DefaultActiveTab(userConfig, ImportMode.PUCRecord)" id="puc-tab" data-bs-toggle="tab" data-bs-target="#puc-tab-pane" type="button" role="tab" aria-selected="false"><i class="bi bi-cloud-check"></i><span class="ms-2">@translator.Translate(userLanguage, "PUC")</span></button>
+                            </li>
+                            }
                             <li class="nav-item text-truncate" role="presentation" style="order: @(userConfig.TabOrder.Count + 1)">
                                 <button class="nav-link resizable-nav-link" type="button" role="tab" aria-selected="false" id="search-tab" onclick="showGlobalSearch()"><i class="bi bi-search"></i><span class="ms-2 ">@translator.Translate(userLanguage, "Search")</span></button>
                             </li>
@@ -191,6 +217,18 @@
         <li class="nav-item d-flex" role="presentation" style="order: @userConfig.TabOrder.FindIndex(x => x == ImportMode.ReminderRecord)">
             <button class="nav-link flex-grow-1 text-start @StaticHelper.DefaultActiveTab(userConfig, ImportMode.ReminderRecord)" id="reminder-tab" data-bs-toggle="tab" data-bs-target="#reminder-tab-pane" type="button" role="tab" aria-selected="false"><span class="display-3 ms-2"><div class="reminderBellDiv" style="display:inline-flex;"><i class="reminderBell bi bi-bell me-2"></i></div>@translator.Translate(userLanguage, "Reminders")</span></button>
         </li>
+        @if (userConfig.VisibleTabs.Contains(ImportMode.InsuranceRecord))
+        {
+        <li class="nav-item d-flex" role="presentation" style="order: @userConfig.TabOrder.FindIndex(x => x == ImportMode.InsuranceRecord)">
+            <button class="nav-link flex-grow-1 text-start @StaticHelper.DefaultActiveTab(userConfig, ImportMode.InsuranceRecord)" id="insurance-tab" data-bs-toggle="tab" data-bs-target="#insurance-tab-pane" type="button" role="tab" aria-selected="false"><span class="display-3 ms-2"><i class="bi bi-shield-check me-2"></i>@translator.Translate(userLanguage, "Insurance")</span></button>
+        </li>
+        }
+        @if (userConfig.VisibleTabs.Contains(ImportMode.PUCRecord))
+        {
+        <li class="nav-item d-flex" role="presentation" style="order: @userConfig.TabOrder.FindIndex(x => x == ImportMode.PUCRecord)">
+            <button class="nav-link flex-grow-1 text-start @StaticHelper.DefaultActiveTab(userConfig, ImportMode.PUCRecord)" id="puc-tab" data-bs-toggle="tab" data-bs-target="#puc-tab-pane" type="button" role="tab" aria-selected="false"><span class="display-3 ms-2"><i class="bi bi-cloud-check me-2"></i>@translator.Translate(userLanguage, "PUC")</span></button>
+        </li>
+        }
     </ul>
 </div>
 <div class="container">
@@ -208,6 +246,8 @@
         <div class="tab-pane fade" id="odometer-tab-pane" role="tabpanel" tabindex="0"></div>
         <div class="tab-pane fade" id="inspection-tab-pane" role="tabpanel" tabindex="0"></div>
         <div class="tab-pane fade" id="equipment-tab-pane" role="tabpanel" tabindex="0"></div>
+        <div class="tab-pane fade" id="insurance-tab-pane" role="tabpanel" tabindex="0"></div>
+        <div class="tab-pane fade" id="puc-tab-pane" role="tabpanel" tabindex="0"></div>
     </div>
 </div>
 <div class="modal fade" data-bs-focus="false" id="editVehicleModal" tabindex="-1" role="dialog" aria-hidden="true">

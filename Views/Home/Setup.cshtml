@@ -91,6 +91,23 @@
                 <input type="text" id="inputWebHook" class="form-control" placeholder="@translator.Translate(userLanguage, "Not Configured")" value="@Model.WebHookURL">
             </div>
             <div class="form-group">
+                <label>@translator.Translate(userLanguage, "Web Push (VAPID)")</label>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">@translator.Translate(userLanguage, "Public Key")</span>
+                    <input type="text" id="inputVapidPublicKey" class="form-control font-monospace" placeholder="@translator.Translate(userLanguage, "Not Configured")" value="@Model.VapidPublicKey" readonly>
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">@translator.Translate(userLanguage, "Private Key")</span>
+                    <input type="password" id="inputVapidPrivateKey" class="form-control font-monospace" placeholder="@translator.Translate(userLanguage, "Not Configured")" value="@Model.VapidPrivateKey" readonly>
+                </div>
+                <div class="input-group mb-1">
+                    <span class="input-group-text">@translator.Translate(userLanguage, "Subject")</span>
+                    <input type="text" id="inputVapidSubject" class="form-control" placeholder="mailto:admin@yourdomain.com" value="@Model.VapidSubject">
+                </div>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="generateVapidKeys()">@translator.Translate(userLanguage, "Generate VAPID Keys")</button>
+                <small class="ms-2 text-muted">@translator.Translate(userLanguage, "Required for Web Push mobile notifications. Save server config after generating.")</small>
+            </div>
+            <div class="form-group">
                 <label for="inputDomain">@translator.Translate(userLanguage, "Server URL")</label>
                 <input type="text" id="inputDomain" class="form-control" placeholder="@translator.Translate(userLanguage, "Not Configured")" value="@Model.Domain">
             </div>

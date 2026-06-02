@@ -43,6 +43,12 @@
             case "equipment-tab":
                 getVehicleEquipmentRecords(vehicleId);
                 break;
+            case "insurance-tab":
+                getVehicleInsuranceRecords(vehicleId);
+                break;
+            case "puc-tab":
+                getVehiclePUCRecords(vehicleId);
+                break;
         }
         $(`.lubelogger-tab #${e.target.id}`).addClass('active');
         $(`.lubelogger-mobile-nav #${e.target.id}`).addClass('active');
@@ -86,6 +92,12 @@
                     break;
                 case "equipment-tab":
                     $("#equipment-tab-pane").html("");
+                    break;
+                case "insurance-tab":
+                    $("#insurance-tab-pane").html("");
+                    break;
+                case "puc-tab":
+                    $("#puc-tab-pane").html("");
                     break;
             }
             $(`.lubelogger-tab #${e.relatedTarget.id}`).removeClass('active');
@@ -203,6 +215,24 @@ function getVehicleEquipmentRecords(vehicleId) {
     $.get(`/Vehicle/GetEquipmentRecordsByVehicleId?vehicleId=${vehicleId}`, function (data) {
         if (data) {
             $("#equipment-tab-pane").html(data);
+            restoreScrollPosition();
+            getVehicleHaveImportantReminders(vehicleId);
+        }
+    });
+}
+function getVehicleInsuranceRecords(vehicleId) {
+    $.get(`/Vehicle/GetInsuranceRecordsByVehicleId?vehicleId=${vehicleId}`, function (data) {
+        if (data) {
+            $("#insurance-tab-pane").html(data);
+            restoreScrollPosition();
+            getVehicleHaveImportantReminders(vehicleId);
+        }
+    });
+}
+function getVehiclePUCRecords(vehicleId) {
+    $.get(`/Vehicle/GetPUCRecordsByVehicleId?vehicleId=${vehicleId}`, function (data) {
+        if (data) {
+            $("#puc-tab-pane").html(data);
             restoreScrollPosition();
             getVehicleHaveImportantReminders(vehicleId);
         }

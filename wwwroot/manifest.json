@@ -1,7 +1,10 @@
 {
-  "name": "LubeLogger",
+  "name": "LubeLogger India",
+  "short_name": "LubeLogger",
   "start_url": "/",
   "display": "standalone",
+  "theme_color": "#0d6efd",
+  "background_color": "#ffffff",
   "icons": [
     {
       "src": "/defaults/lubelogger_icon_72.png",

@@ -69,6 +69,12 @@
             <input class="form-check-input" onChange="updateSettings()" type="checkbox" role="switch" id="useGridInMobile" checked="@Model.UserConfig.UseGridInMobile">
             <label class="form-check-label" for="useGridInMobile">@translator.Translate(userLanguage, "Use Grid in Mobile")</label>
         </div>
+        <div class="mt-2">
+            <button id="pushToggleBtn" type="button" class="btn btn-outline-primary btn-sm" onclick="togglePushNotifications()" data-subscribed="false">
+                <i class="bi bi-bell me-1"></i>@translator.Translate(userLanguage, "Enable Push Notifications")
+            </button>
+            <small class="ms-2 text-muted">@translator.Translate(userLanguage, "Receive reminders on this device")</small>
+        </div>
         <hr />
         <div class="form-check form-switch">
             <input class="form-check-input" onChange="updateSettings()" type="checkbox" role="switch" id="useMPG" checked="@Model.UserConfig.UseMPG">
@@ -91,6 +97,18 @@
         <div class="form-check form-switch">
             <input class="form-check-input" onChange="updateSettings()" type="checkbox" role="switch" id="useThreeDecimalGasConsumption" checked="@Model.UserConfig.UseThreeDecimalGasConsumption">
             <label class="form-check-label" for="useThreeDecimalGasConsumption">@translator.Translate(userLanguage, "Use Three Decimals For Fuel Consumption")</label>
+        </div>
+        <div class="mt-2">
+            <label class="form-label fw-semibold">@translator.Translate(userLanguage, "Currency Symbol")</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="preferredCurrencySymbol" value="@Model.UserConfig.PreferredCurrencySymbol" placeholder="@translator.Translate(userLanguage, "Default (from locale)")" onchange="updateSettings()" maxlength="4" style="max-width:140px;">
+                <button type="button" class="btn btn-outline-secondary" onclick="setCurrencySymbol('₹')" title="Indian Rupee">₹</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="setCurrencySymbol('$')" title="US Dollar">$</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="setCurrencySymbol('€')" title="Euro">€</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="setCurrencySymbol('£')" title="British Pound">£</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="setCurrencySymbol('')" title="@translator.Translate(userLanguage, "Reset to locale default")">@translator.Translate(userLanguage, "Reset")</button>
+            </div>
+            <small class="text-muted">@translator.Translate(userLanguage, "Overrides the locale currency symbol across the app")</small>
         </div>
         <hr />
         <div class="form-check form-switch form-check-inline">

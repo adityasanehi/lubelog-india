@@ -2,6 +2,8 @@
 using CarCareTracker.Helper;
 using CarCareTracker.Models;
 using System.Text;
+using System.Text.Json;
+using WebPush;
 
 namespace CarCareTracker.Logic
 {
@@ -10,6 +12,7 @@ namespace CarCareTracker.Logic
         Task RunAutomatedEvents();
         Task CheckReminderStateChanged();
         Task SendNotificationToExternalServices(NotificationServiceConfig serviceConfig, ReminderRecordViewModel reminderToSend, Vehicle vehicle);
+        Task SendWebPushToUsers(List<int> userIds, string title, string body, string url);
     }
     public class NotificationLogic: INotificationLogic
     {
@@ -25,9 +28,10 @@ namespace CarCareTracker.Logic
         private readonly IUserRecordDataAccess _userRecordDataAccess;
         private readonly IReminderHelper _reminderHelper;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IPushSubscriptionDataAccess _pushSubscriptionDataAccess;
         private readonly ILogger<NotificationLogic> _logger;
-        public NotificationLogic(IConfigHelper config, 
-            IFileHelper fileHelper, 
+        public NotificationLogic(IConfigHelper config,
+            IFileHelper fileHelper,
             IMailHelper mailHelper,
             ITranslationHelper translationHelper,
             IReminderHelper reminderHelper,
@@ -37,12 +41,14 @@ namespace CarCareTracker.Logic
             IReminderRecordDataAccess reminderRecordDataAccess,
             IVehicleLogic vehicleLogic,
             IHttpClientFactory httpClientFactory,
+            IPushSubscriptionDataAccess pushSubscriptionDataAccess,
             ILogger<NotificationLogic> logger
             )
         {
             _config = config;
             _fileHelper = fileHelper;
             _mailHelper = mailHelper;
+            _pushSubscriptionDataAccess = pushSubscriptionDataAccess;
             _reminderHelper = reminderHelper;
             _translator = translationHelper;
             _dataAccess = dataAccess;
@@ -317,6 +323,19 @@ namespace CarCareTracker.Logic
                                 }
                             }
                         }
+                        // Web Push notifications
+                        if (_config.GetWebPushEnabled())
+                        {
+                            var userIds = _userAccessDataAccess.GetUserAccessByVehicleId(vehicle.Id).Select(x => x.Id.UserId).ToList();
+                            var serverDomain = _config.GetServerDomain();
+                            foreach (ReminderRecordViewModel reminderToSend in groupedNotification)
+                            {
+                                string pushTitle = $"{vehicle.Year} {vehicle.Make} {vehicle.Model}";
+                                string pushBody = $"{StaticHelper.GetTitleCaseReminderUrgency(reminderToSend.Urgency)} - {reminderToSend.Description}";
+                                string pushUrl = string.IsNullOrWhiteSpace(serverDomain) ? "/" : $"{serverDomain.TrimEnd('/')}/Vehicle/Index?vehicleId={vehicle.Id}&tab=reminder";
+                                await SendWebPushToUsers(userIds, pushTitle, pushBody, pushUrl);
+                            }
+                        }
                         _cachedReminders.AddRange(groupedNotification.Select(x => new CachedReminderRecord { Id = x.Id, Urgency = x.Urgency, DateAdded = DateTime.Now }));
                     }
                 }
@@ -373,6 +392,40 @@ namespace CarCareTracker.Logic
         private string RenderNotificationBody(string inputString, string vehicleId, string title, string message, string priority, string linkToClick, string domain)
         {
             return inputString.Replace("{vehicleId}", vehicleId).Replace("{title}", title).Replace("{message}", message).Replace("{priority}", priority).Replace("{link}", linkToClick).Replace("{domain}", domain);
+        }
+        public async Task SendWebPushToUsers(List<int> userIds, string title, string body, string url)
+        {
+            if (!_config.GetWebPushEnabled()) return;
+            var vapidPublicKey = _config.GetVapidPublicKey();
+            var vapidPrivateKey = _config.GetVapidPrivateKey();
+            var vapidSubject = _config.GetVapidSubject();
+            if (string.IsNullOrWhiteSpace(vapidSubject))
+                vapidSubject = "mailto:admin@lubelogger.local";
+            var vapidDetails = new VapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
+            var payload = JsonSerializer.Serialize(new { title, body, url });
+            foreach (int userId in userIds)
+            {
+                var subscriptions = _pushSubscriptionDataAccess.GetSubscriptionsByUserId(userId);
+                foreach (var sub in subscriptions)
+                {
+                    try
+                    {
+                        var webPushClient = new WebPushClient();
+                        var pushSubscription = new WebPush.PushSubscription(sub.Endpoint, sub.P256DH, sub.Auth);
+                        await webPushClient.SendNotificationAsync(pushSubscription, payload, vapidDetails);
+                    }
+                    catch (WebPushException ex) when ((int)ex.StatusCode == 410 || (int)ex.StatusCode == 404)
+                    {
+                        // Subscription expired or invalid — remove it
+                        _pushSubscriptionDataAccess.DeleteSubscriptionByEndpoint(sub.Endpoint);
+                        _logger.LogInformation($"Removed expired push subscription for user {userId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Web Push failed for user {userId}: {ex.Message}");
+                    }
+                }
+            }
         }
     }
 }

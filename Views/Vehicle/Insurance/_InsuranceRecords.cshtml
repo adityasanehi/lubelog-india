@@ -1,0 +1,104 @@
+@using CarCareTracker.Helper
+@inject IConfigHelper config
+@inject ITranslationHelper translator
+@{
+    var userConfig = config.GetUserConfig(User);
+    var userLanguage = userConfig.UserLanguage;
+    var enableCsvImports = userConfig.EnableCsvImports;
+    var recordTags = Model.SelectMany(x => x.Tags).Distinct();
+}
+@model List<InsuranceRecord>
+<div class="d-flex flex-column vehicleTabPane">
+<div class="row">
+    <div class="d-flex justify-content-between">
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <span class="badge bg-success" data-aggregate-type="count">@($"{translator.Translate(userLanguage, "# of Insurance Records")}: {Model.Count()}")</span>
+            <span class="badge bg-primary" data-aggregate-type="sum">@($"{translator.Translate(userLanguage, "Total Premium")}: {Model.Sum(x => x.Premium).ToString("C")}")</span>
+            @foreach (string recordTag in recordTags)
+            {
+                <span onclick="filterTable('insurance-tab-pane', this)" class="user-select-none rounded-pill badge bg-secondary tagfilter" style="cursor:pointer;">@recordTag</span>
+            }
+        </div>
+        <div class="lubelogger-record-add">
+            <div class="btn-group">
+                <button onclick="showAddInsuranceRecordModal()" class="btn btn-primary btn-md mt-1 mb-1"><i class="bi bi-pencil-square me-2"></i>@translator.Translate(userLanguage, "Add Insurance Record")</button>
+                <button type="button" class="btn btn-md btn-primary btn-md mt-1 mb-1 dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu record-dropdown">
+                    <li><a class="dropdown-item" href="#" onclick="printTab()">@translator.Translate(userLanguage, "Print")</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="searchTableRows('insurance-tab-pane')">@translator.Translate(userLanguage, "Search")</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row vehicleDetailTabContainer flex-grow-1">
+    <div class="col-12">
+        <div class="row mt-2 showOnPrint">
+            <div class="d-flex">
+                <img src="@config.GetLogoUrl()" class="lubelogger-logo" />
+            </div>
+        </div>
+        <table class="table table-hover @(userConfig.UseGridInMobile ? "" : "ll-responsive-table")">
+            <thead class="sticky-top">
+                <tr class="d-flex">
+                    <th scope="col" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Policy #")</th>
+                    <th scope="col" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Insurer")</th>
+                    <th scope="col" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Type")</th>
+                    <th scope="col" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Premium")</th>
+                    <th scope="col" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Start Date")</th>
+                    <th scope="col" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Expiry Date")</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (InsuranceRecord record in Model)
+                {
+                    var isExpired = record.ExpiryDate < DateTime.Now;
+                    var isExpiringSoon = !isExpired && record.ExpiryDate < DateTime.Now.AddDays(30);
+                    <tr class="d-flex user-select-none @(isExpired ? "table-danger" : isExpiringSoon ? "table-warning" : "")"
+                        style="cursor:pointer;"
+                        onclick="showEditInsuranceRecordModal(@record.Id)"
+                        data-tags='@string.Join(" ", record.Tags)'>
+                        <td data-label="@translator.Translate(userLanguage, "Policy #")" class="col-2 flex-grow-1 text-truncate">@record.PolicyNumber</td>
+                        <td data-label="@translator.Translate(userLanguage, "Insurer")" class="col-2 flex-grow-1 text-truncate">@record.InsurerName</td>
+                        <td data-label="@translator.Translate(userLanguage, "Type")" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, record.PolicyType.ToString())</td>
+                        <td data-label="@translator.Translate(userLanguage, "Premium")" class="col-2 flex-grow-1 text-truncate" data-record-type="cost">@record.Premium.ToString("C")</td>
+                        <td data-label="@translator.Translate(userLanguage, "Start Date")" class="col-2 flex-grow-1 text-truncate">@record.StartDate.ToShortDateString()</td>
+                        <td data-label="@translator.Translate(userLanguage, "Expiry Date")" class="col-2 flex-grow-1 text-truncate">
+                            @record.ExpiryDate.ToShortDateString()
+                            @if (isExpired)
+                            {
+                                <span class="badge bg-danger ms-1">@translator.Translate(userLanguage, "Expired")</span>
+                            }
+                            else if (isExpiringSoon)
+                            {
+                                <span class="badge bg-warning text-dark ms-1">@translator.Translate(userLanguage, "Expiring Soon")</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="d-flex">
+                    <td class="col-12 showOnPrint lubelogger-report-banner">@StaticHelper.ReportNote</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<div class="row lubelogger-record-nav pt-1 hideOnPrint">
+    <div class="d-flex justify-content-between">
+        <div></div>
+        <button onclick="showAddInsuranceRecordModal()" class="btn btn-primary btn-md mt-1 mb-1"><i class="bi bi-plus-lg"></i></button>
+        <div></div>
+    </div>
+</div>
+</div>
+
+<div class="modal fade" data-bs-focus="false" id="insuranceRecordModal" tabindex="-1" role="dialog" aria-hidden="true" onpaste="handleModalPaste(event)">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="insuranceRecordModalContent">
+        </div>
+    </div>
+</div>

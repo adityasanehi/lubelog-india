@@ -16,6 +16,7 @@
     var firstDayOfWeek = (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
     var numberFormat = CultureInfo.CurrentCulture.NumberFormat;
     var userLanguage = userConfig.UserLanguage;
+    var preferredCurrencySymbol = userConfig.PreferredCurrencySymbol;
     var webSocketEnabled = config.GetWebSocketEnabled();
     var resizeThumbnailEnabled = config.GetResizeThumbnailEnabled();
     shortDatePattern = shortDatePattern.ToLower();
@@ -69,7 +70,7 @@
                 useDarkMode: "@useDarkMode" == "True" || ("@useSystemColorMode" == "True" && window.matchMedia('(prefers-color-scheme: dark)').matches),
                 enableCsvImport : "@enableCsvImports" == "True",
                 useMarkDown: "@useMarkDown" == "True",
-                currencySymbol: decodeHTMLEntities("@numberFormat.CurrencySymbol"),
+                currencySymbol: "@preferredCurrencySymbol" !== "" ? decodeHTMLEntities("@preferredCurrencySymbol") : decodeHTMLEntities("@numberFormat.CurrencySymbol"),
                 useThreeDecimals: "@useThreeDecimals" == "True",
                 useMPG: "@useMPG" == "True",
                 webSocketEnabled: "@webSocketEnabled" == "True",
@@ -86,7 +87,7 @@
             //remove thousands separator.
             var thousandSeparator = decodeHTMLEntities("@numberFormat.NumberGroupSeparator");
             var decimalSeparator = decodeHTMLEntities("@numberFormat.NumberDecimalSeparator");
-            var currencySymbol = decodeHTMLEntities("@numberFormat.CurrencySymbol");
+            var currencySymbol = "@preferredCurrencySymbol" !== "" ? decodeHTMLEntities("@preferredCurrencySymbol") : decodeHTMLEntities("@numberFormat.CurrencySymbol");
             if (input == "---") {
                 input = "0";
             }
@@ -144,8 +145,8 @@
         }
         function globalAppendCurrency(input){
             //check currency symbol position
-            var currencySymbolPosition = "@numberFormat.CurrencyPositivePattern";
-            var currencySymbol = decodeHTMLEntities("@numberFormat.CurrencySymbol");
+            var currencySymbolPosition = "@preferredCurrencySymbol" !== "" ? "0" : "@numberFormat.CurrencyPositivePattern";
+            var currencySymbol = "@preferredCurrencySymbol" !== "" ? decodeHTMLEntities("@preferredCurrencySymbol") : decodeHTMLEntities("@numberFormat.CurrencySymbol");
             switch (currencySymbolPosition) {
                 case "0":
                     return `${currencySymbol}${input}`;
@@ -169,6 +170,90 @@
         }
     </script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        // Service Worker + Web Push registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                window._swRegistration = reg;
+            });
+        }
+        function getVapidPublicKey() {
+            return fetch('/api/push/vapid-public-key').then(r => r.json());
+        }
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+        }
+        function subscribeToPush() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                alert('Push notifications are not supported in this browser.');
+                return;
+            }
+            getVapidPublicKey().then(function(config) {
+                if (!config.enabled) { alert('Web Push is not configured on this server.'); return; }
+                Notification.requestPermission().then(function(permission) {
+                    if (permission !== 'granted') return;
+                    navigator.serviceWorker.ready.then(function(reg) {
+                        reg.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(config.publicKey)
+                        }).then(function(subscription) {
+                            var s = subscription.toJSON();
+                            fetch('/api/push/subscribe', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ endpoint: s.endpoint, p256DH: s.keys.p256dh, auth: s.keys.auth })
+                            }).then(function() {
+                                updatePushButtonState(true);
+                            });
+                        });
+                    });
+                });
+            });
+        }
+        function unsubscribeFromPush() {
+            navigator.serviceWorker.ready.then(function(reg) {
+                reg.pushManager.getSubscription().then(function(subscription) {
+                    if (!subscription) return;
+                    var endpoint = subscription.endpoint;
+                    subscription.unsubscribe().then(function() {
+                        fetch('/api/push/subscribe', {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ endpoint: endpoint })
+                        }).then(function() {
+                            updatePushButtonState(false);
+                        });
+                    });
+                });
+            });
+        }
+        function updatePushButtonState(subscribed) {
+            var btn = document.getElementById('pushToggleBtn');
+            if (!btn) return;
+            btn.textContent = subscribed ? 'Disable Push Notifications' : 'Enable Push Notifications';
+            btn.dataset.subscribed = subscribed ? 'true' : 'false';
+        }
+        function togglePushNotifications() {
+            var btn = document.getElementById('pushToggleBtn');
+            if (btn && btn.dataset.subscribed === 'true') {
+                unsubscribeFromPush();
+            } else {
+                subscribeToPush();
+            }
+        }
+        // Initialise push button state on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+            navigator.serviceWorker.ready.then(function(reg) {
+                reg.pushManager.getSubscription().then(function(sub) {
+                    updatePushButtonState(!!sub);
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     @await RenderSectionAsync("Nav", required: false)

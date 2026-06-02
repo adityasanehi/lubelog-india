@@ -1,0 +1,100 @@
+@using CarCareTracker.Helper
+@inject IConfigHelper config
+@inject ITranslationHelper translator
+@{
+    var userConfig = config.GetUserConfig(User);
+    var userLanguage = userConfig.UserLanguage;
+    var recordTags = Model.SelectMany(x => x.Tags).Distinct();
+}
+@model List<PUCRecord>
+<div class="d-flex flex-column vehicleTabPane">
+<div class="row">
+    <div class="d-flex justify-content-between">
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <span class="badge bg-success" data-aggregate-type="count">@($"{translator.Translate(userLanguage, "# of PUC Records")}: {Model.Count()}")</span>
+            @foreach (string recordTag in recordTags)
+            {
+                <span onclick="filterTable('puc-tab-pane', this)" class="user-select-none rounded-pill badge bg-secondary tagfilter" style="cursor:pointer;">@recordTag</span>
+            }
+        </div>
+        <div class="lubelogger-record-add">
+            <div class="btn-group">
+                <button onclick="showAddPUCRecordModal()" class="btn btn-primary btn-md mt-1 mb-1"><i class="bi bi-pencil-square me-2"></i>@translator.Translate(userLanguage, "Add PUC Record")</button>
+                <button type="button" class="btn btn-md btn-primary btn-md mt-1 mb-1 dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu record-dropdown">
+                    <li><a class="dropdown-item" href="#" onclick="printTab()">@translator.Translate(userLanguage, "Print")</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="searchTableRows('puc-tab-pane')">@translator.Translate(userLanguage, "Search")</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row vehicleDetailTabContainer flex-grow-1">
+    <div class="col-12">
+        <div class="row mt-2 showOnPrint">
+            <div class="d-flex">
+                <img src="@config.GetLogoUrl()" class="lubelogger-logo" />
+            </div>
+        </div>
+        <table class="table table-hover @(userConfig.UseGridInMobile ? "" : "ll-responsive-table")">
+            <thead class="sticky-top">
+                <tr class="d-flex">
+                    <th scope="col" class="col-3 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Certificate #")</th>
+                    <th scope="col" class="col-3 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Test Center")</th>
+                    <th scope="col" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Test Date")</th>
+                    <th scope="col" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Expiry Date")</th>
+                    <th scope="col" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, "Notes")</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (PUCRecord record in Model)
+                {
+                    var isExpired = record.ExpiryDate < DateTime.Now;
+                    var isExpiringSoon = !isExpired && record.ExpiryDate < DateTime.Now.AddDays(30);
+                    <tr class="d-flex user-select-none @(isExpired ? "table-danger" : isExpiringSoon ? "table-warning" : "")"
+                        style="cursor:pointer;"
+                        onclick="showEditPUCRecordModal(@record.Id)"
+                        data-tags='@string.Join(" ", record.Tags)'>
+                        <td data-label="@translator.Translate(userLanguage, "Certificate #")" class="col-3 flex-grow-1 text-truncate">@record.CertificateNumber</td>
+                        <td data-label="@translator.Translate(userLanguage, "Test Center")" class="col-3 flex-grow-1 text-truncate">@record.TestCenter</td>
+                        <td data-label="@translator.Translate(userLanguage, "Test Date")" class="col-2 flex-grow-1 text-truncate">@record.TestDate.ToShortDateString()</td>
+                        <td data-label="@translator.Translate(userLanguage, "Expiry Date")" class="col-2 flex-grow-1 text-truncate">
+                            @record.ExpiryDate.ToShortDateString()
+                            @if (isExpired)
+                            {
+                                <span class="badge bg-danger ms-1">@translator.Translate(userLanguage, "Expired")</span>
+                            }
+                            else if (isExpiringSoon)
+                            {
+                                <span class="badge bg-warning text-dark ms-1">@translator.Translate(userLanguage, "Expiring Soon")</span>
+                            }
+                        </td>
+                        <td data-label="@translator.Translate(userLanguage, "Notes")" class="col-2 flex-grow-1 text-truncate">@StaticHelper.TruncateStrings(record.Notes)</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="d-flex">
+                    <td class="col-12 showOnPrint lubelogger-report-banner">@StaticHelper.ReportNote</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<div class="row lubelogger-record-nav pt-1 hideOnPrint">
+    <div class="d-flex justify-content-between">
+        <div></div>
+        <button onclick="showAddPUCRecordModal()" class="btn btn-primary btn-md mt-1 mb-1"><i class="bi bi-plus-lg"></i></button>
+        <div></div>
+    </div>
+</div>
+</div>
+
+<div class="modal fade" data-bs-focus="false" id="pucRecordModal" tabindex="-1" role="dialog" aria-hidden="true" onpaste="handleModalPaste(event)">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="pucRecordModalContent">
+        </div>
+    </div>
+</div>

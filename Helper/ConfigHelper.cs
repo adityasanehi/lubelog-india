@@ -42,6 +42,10 @@ namespace CarCareTracker.Helper
         bool GetServerOpenRegistration();
         string GetDefaultReminderEmail();
         int GetAuthCookieLifeSpan();
+        string GetVapidPublicKey();
+        string GetVapidPrivateKey();
+        string GetVapidSubject();
+        bool GetWebPushEnabled();
     }
     public class ConfigHelper : IConfigHelper
     {
@@ -522,6 +526,15 @@ namespace CarCareTracker.Helper
                     }
                 }
             });
+        }
+        public string GetVapidPublicKey() => CheckString("VAPID_PUBLIC_KEY");
+        public string GetVapidPrivateKey() => CheckString("VAPID_PRIVATE_KEY");
+        public string GetVapidSubject() => CheckString("VAPID_SUBJECT");
+        public bool GetWebPushEnabled()
+        {
+            var pub = GetVapidPublicKey();
+            var priv = GetVapidPrivateKey();
+            return !string.IsNullOrWhiteSpace(pub) && !string.IsNullOrWhiteSpace(priv);
         }
     }
 }

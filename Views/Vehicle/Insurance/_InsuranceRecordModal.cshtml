@@ -1,0 +1,97 @@
+@using CarCareTracker.Helper
+@inject IConfigHelper config
+@inject ITranslationHelper translator
+@model InsuranceRecordInput
+@{
+    var isNew = Model.Id == 0;
+    var userConfig = config.GetUserConfig(User);
+    var userLanguage = userConfig.UserLanguage;
+}
+<div class="modal-header">
+    <h5 class="modal-title">@(isNew ? translator.Translate(userLanguage, "Add Insurance Record") : translator.Translate(userLanguage, "Edit Insurance Record"))</h5>
+    <button type="button" class="btn-close" onclick="hideAddInsuranceRecordModal()" aria-label="Close"></button>
+</div>
+<div class="modal-body" onkeydown="handleEnter(this)">
+    <form>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6 col-12">
+                    <input type="text" id="workAroundInput" style="height:0px; width:0px; display:none;">
+                    <label for="insurancePolicyNumber">@translator.Translate(userLanguage, "Policy Number")</label>
+                    <input type="text" id="insurancePolicyNumber" class="form-control" placeholder="@translator.Translate(userLanguage, "Policy number")" value="@Model.PolicyNumber">
+                    <label for="insuranceInsurerName">@translator.Translate(userLanguage, "Insurer Name")</label>
+                    <input type="text" id="insuranceInsurerName" class="form-control" placeholder="@translator.Translate(userLanguage, "Insurance company name")" value="@Model.InsurerName">
+                    <label for="insurancePolicyType">@translator.Translate(userLanguage, "Policy Type")</label>
+                    <select class="form-select" id="insurancePolicyType">
+                        <option value="Comprehensive" @(Model.PolicyType == "Comprehensive" ? "selected" : "")>@translator.Translate(userLanguage, "Comprehensive")</option>
+                        <option value="ThirdParty" @(Model.PolicyType == "ThirdParty" ? "selected" : "")>@translator.Translate(userLanguage, "Third Party")</option>
+                        <option value="OwnDamage" @(Model.PolicyType == "OwnDamage" ? "selected" : "")>@translator.Translate(userLanguage, "Own Damage")</option>
+                    </select>
+                    <label for="insurancePremium">@translator.Translate(userLanguage, "Premium")</label>
+                    <input type="text" inputmode="decimal" onkeydown="interceptDecimalKeys(event)" onkeyup="fixDecimalInput(this, 2)" id="insurancePremium" class="form-control" placeholder="@translator.Translate(userLanguage, "Premium amount")" value="@(isNew ? "" : Model.Premium)">
+                    <label for="insuranceTag">@translator.Translate(userLanguage, "Tags(optional)")</label>
+                    <select multiple class="form-select" id="insuranceTag">
+                        @foreach (string tag in Model.Tags)
+                        {
+                            <option value="@tag">@tag</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6 col-12">
+                    <label for="insuranceStartDate">@translator.Translate(userLanguage, "Start Date")</label>
+                    <div class="input-group">
+                        <input type="text" id="insuranceStartDate" class="form-control" placeholder="@translator.Translate(userLanguage, "Policy start date")" value="@Model.StartDate">
+                        <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                    </div>
+                    <label for="insuranceExpiryDate">@translator.Translate(userLanguage, "Expiry Date")</label>
+                    <div class="input-group">
+                        <input type="text" id="insuranceExpiryDate" class="form-control" placeholder="@translator.Translate(userLanguage, "Policy expiry date")" value="@Model.ExpiryDate">
+                        <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                    </div>
+                    @if (isNew)
+                    {
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <a onclick="showRecurringReminderSelector('insurancePolicyNumber', 'insuranceNotes')" class="btn btn-link">@translator.Translate(userLanguage, "Select Reminder")</a>
+                            </div>
+                        </div>
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" value="" id="addInsuranceReminderCheck">
+                            <label class="form-check-label" for="addInsuranceReminderCheck">
+                                @translator.Translate(userLanguage, "Add Reminder")
+                            </label>
+                        </div>
+                    }
+                    <label for="insuranceNotes" class="mt-2">@translator.Translate(userLanguage, "Notes(optional)")</label>
+                    <textarea id="insuranceNotes" class="form-control" rows="3">@Model.Notes</textarea>
+                    <div class="mt-2">
+                        @await Html.PartialAsync("_UploadedFiles", Model.Files)
+                        @await Html.PartialAsync("_FileUploader", Model.Files.Any())
+                    </div>
+                    <div id="filesPendingUpload"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    @if (!isNew)
+    {
+        <button type="button" class="btn btn-danger" onclick="deleteInsuranceRecord(@Model.Id)" style="margin-right:auto;">@translator.Translate(userLanguage, "Delete")</button>
+    }
+    <button type="button" class="btn btn-secondary" onclick="hideAddInsuranceRecordModal()">@translator.Translate(userLanguage, "Cancel")</button>
+    @if (isNew)
+    {
+        <button type="button" class="btn btn-primary" onclick="saveInsuranceRecordToVehicle()">@translator.Translate(userLanguage, "Add Insurance Record")</button>
+    }
+    else
+    {
+        <button type="button" class="btn btn-primary" onclick="saveInsuranceRecordToVehicle(true)">@translator.Translate(userLanguage, "Edit Insurance Record")</button>
+    }
+</div>
+<script>
+    var recurringReminderRecordId = [];
+    function getInsuranceRecordModelData() {
+        return { id: @Model.Id }
+    }
+</script>

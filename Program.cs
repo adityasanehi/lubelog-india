@@ -67,6 +67,9 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["POSTGRES_CONNECTION"])){
     builder.Services.AddSingleton<IEquipmentRecordDataAccess, PGEquipmentRecordDataAccess>();
     builder.Services.AddSingleton<IUserHouseholdDataAccess, PGUserHouseholdDataAccess>();
     builder.Services.AddSingleton<IApiKeyRecordDataAccess, PGApiKeyRecordDataAccess>();
+    builder.Services.AddSingleton<IInsuranceRecordDataAccess, PGInsuranceRecordDataAccess>();
+    builder.Services.AddSingleton<IPUCRecordDataAccess, PGPUCRecordDataAccess>();
+    builder.Services.AddSingleton<IPushSubscriptionDataAccess, PGPushSubscriptionDataAccess>();
 }
 else
 {
@@ -92,6 +95,9 @@ else
     builder.Services.AddSingleton<IEquipmentRecordDataAccess, EquipmentRecordDataAccess>();
     builder.Services.AddSingleton<IUserHouseholdDataAccess, UserHouseholdDataAccess>();
     builder.Services.AddSingleton<IApiKeyRecordDataAccess, ApiKeyRecordDataAccess>();
+    builder.Services.AddSingleton<IInsuranceRecordDataAccess, InsuranceRecordDataAccess>();
+    builder.Services.AddSingleton<IPUCRecordDataAccess, PUCRecordDataAccess>();
+    builder.Services.AddSingleton<IPushSubscriptionDataAccess, PushSubscriptionDataAccess>();
 }
 
 //configure helpers

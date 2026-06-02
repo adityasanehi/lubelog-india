@@ -75,6 +75,9 @@ function saveSetup() {
         MessageOfTheDay: $("#inputMOTD").val(),
         WebHookURL: $("#inputWebHook").val(),
         ServerURL: $("#inputDomain").val(),
+        VapidPublicKey: $("#inputVapidPublicKey").val(),
+        VapidPrivateKey: $("#inputVapidPrivateKey").val(),
+        VapidSubject: $("#inputVapidSubject").val(),
         CustomWidgetsEnabled: $("#inputCustomWidget").val(),
         InvariantAPIEnabled: $("#inputInvariantAPI").val(),
         ResizeThumbnail: $('#inputResizeThumbnail').val(),
@@ -329,4 +332,15 @@ function nextOnSkip(sender) {
     if ($(sender).is(":checked")) {
         nextSetupPage();
     }
+}
+function generateVapidKeys() {
+    $.get('/Home/GenerateVapidKeys', function (data) {
+        if (data.publicKey) {
+            $("#inputVapidPublicKey").val(data.publicKey);
+            $("#inputVapidPrivateKey").val(data.privateKey);
+            successToast("VAPID keys generated. Save server config to apply.");
+        } else {
+            errorToast(genericErrorMessage());
+        }
+    });
 }

@@ -67,6 +67,7 @@ function updateSettings() {
         hideSoldVehicles: $("#hideSoldVehicles").is(":checked"),
         preferredGasUnit: $("#preferredGasUnit").val(),
         preferredGasMileageUnit: $("#preferredFuelMileageUnit").val(),
+        preferredCurrencySymbol: $("#preferredCurrencySymbol").val(),
         userLanguage: $("#defaultLanguage").val(),
         useUnitForFuelCost: $("#useUnitForFuelCost").is(":checked"),
         useGridInMobile: $("#useGridInMobile").is(":checked"),
@@ -477,4 +478,8 @@ function loadTooltips() {
         event.stopPropagation();
         event.preventDefault();
     })
+}
+function setCurrencySymbol(symbol) {
+    $("#preferredCurrencySymbol").val(symbol);
+    updateSettings();
 }

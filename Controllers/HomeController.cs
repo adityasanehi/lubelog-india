@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Security.Claims;
 using System.Text.Json;
+using WebPush;
 
 namespace CarCareTracker.Controllers
 {
@@ -676,7 +677,10 @@ namespace CarCareTracker.Controllers
                 KestrelAppConfig = _config.GetKestrelAppConfig(),
                 EnableAutomatedEvents = _config.GetAutomatedEventsEnabled(),
                 NotificationConfig = _config.GetNotificationConfig(),
-                SkippedSettings = _config.GetSkippedSettings()
+                SkippedSettings = _config.GetSkippedSettings(),
+                VapidPublicKey = _config.GetVapidPublicKey(),
+                VapidPrivateKey = _config.GetVapidPrivateKey(),
+                VapidSubject = _config.GetVapidSubject()
             };
             return View(viewModel);
         }
@@ -692,6 +696,13 @@ namespace CarCareTracker.Controllers
         {
             var result = _config.SaveServerConfig(serverConfig);
             return Json(result);
+        }
+        [HttpGet]
+        [Authorize(Roles = nameof(UserData.IsRootUser))]
+        public IActionResult GenerateVapidKeys()
+        {
+            var keys = WebPush.VapidHelper.GenerateVapidKeys();
+            return Json(new { publicKey = keys.PublicKey, privateKey = keys.PrivateKey });
         }
         [HttpPost]
         [Authorize(Roles = nameof(UserData.IsRootUser))]

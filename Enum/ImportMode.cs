@@ -15,6 +15,8 @@
         OdometerRecord = 10,
         VehicleRecord = 11,
         InspectionRecord = 12,
-        EquipmentRecord = 13
+        EquipmentRecord = 13,
+        InsuranceRecord = 14,
+        PUCRecord = 15
     }
 }

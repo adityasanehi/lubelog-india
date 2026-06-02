@@ -1,0 +1,89 @@
+@using CarCareTracker.Helper
+@inject IConfigHelper config
+@inject ITranslationHelper translator
+@model PUCRecordInput
+@{
+    var isNew = Model.Id == 0;
+    var userConfig = config.GetUserConfig(User);
+    var userLanguage = userConfig.UserLanguage;
+}
+<div class="modal-header">
+    <h5 class="modal-title">@(isNew ? translator.Translate(userLanguage, "Add PUC Record") : translator.Translate(userLanguage, "Edit PUC Record"))</h5>
+    <button type="button" class="btn-close" onclick="hideAddPUCRecordModal()" aria-label="Close"></button>
+</div>
+<div class="modal-body" onkeydown="handleEnter(this)">
+    <form>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6 col-12">
+                    <input type="text" id="workAroundInput" style="height:0px; width:0px; display:none;">
+                    <label for="pucCertificateNumber">@translator.Translate(userLanguage, "Certificate Number")</label>
+                    <input type="text" id="pucCertificateNumber" class="form-control" placeholder="@translator.Translate(userLanguage, "PUC certificate number")" value="@Model.CertificateNumber">
+                    <label for="pucTestCenter">@translator.Translate(userLanguage, "Test Center")</label>
+                    <input type="text" id="pucTestCenter" class="form-control" placeholder="@translator.Translate(userLanguage, "Test center name or location")" value="@Model.TestCenter">
+                    <label for="pucTestDate">@translator.Translate(userLanguage, "Test Date")</label>
+                    <div class="input-group">
+                        <input type="text" id="pucTestDate" class="form-control" placeholder="@translator.Translate(userLanguage, "Date of PUC test")" value="@Model.TestDate">
+                        <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                    </div>
+                    <label for="pucExpiryDate">@translator.Translate(userLanguage, "Expiry Date")</label>
+                    <div class="input-group">
+                        <input type="text" id="pucExpiryDate" class="form-control" placeholder="@translator.Translate(userLanguage, "Certificate expiry date")" value="@Model.ExpiryDate">
+                        <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                    </div>
+                    <label for="pucTag">@translator.Translate(userLanguage, "Tags(optional)")</label>
+                    <select multiple class="form-select" id="pucTag">
+                        @foreach (string tag in Model.Tags)
+                        {
+                            <option value="@tag">@tag</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6 col-12">
+                    @if (isNew)
+                    {
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <a onclick="showRecurringReminderSelector('pucCertificateNumber', 'pucNotes')" class="btn btn-link">@translator.Translate(userLanguage, "Select Reminder")</a>
+                            </div>
+                        </div>
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" value="" id="addPUCReminderCheck" checked>
+                            <label class="form-check-label" for="addPUCReminderCheck">
+                                @translator.Translate(userLanguage, "Add Reminder") <small class="text-muted">(@translator.Translate(userLanguage, "recommended - PUC expires every 6 months"))</small>
+                            </label>
+                        </div>
+                    }
+                    <label for="pucNotes" class="mt-2">@translator.Translate(userLanguage, "Notes(optional)")</label>
+                    <textarea id="pucNotes" class="form-control" rows="4">@Model.Notes</textarea>
+                    <div class="mt-2">
+                        @await Html.PartialAsync("_UploadedFiles", Model.Files)
+                        @await Html.PartialAsync("_FileUploader", Model.Files.Any())
+                    </div>
+                    <div id="filesPendingUpload"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    @if (!isNew)
+    {
+        <button type="button" class="btn btn-danger" onclick="deletePUCRecord(@Model.Id)" style="margin-right:auto;">@translator.Translate(userLanguage, "Delete")</button>
+    }
+    <button type="button" class="btn btn-secondary" onclick="hideAddPUCRecordModal()">@translator.Translate(userLanguage, "Cancel")</button>
+    @if (isNew)
+    {
+        <button type="button" class="btn btn-primary" onclick="savePUCRecordToVehicle()">@translator.Translate(userLanguage, "Add PUC Record")</button>
+    }
+    else
+    {
+        <button type="button" class="btn btn-primary" onclick="savePUCRecordToVehicle(true)">@translator.Translate(userLanguage, "Edit PUC Record")</button>
+    }
+</div>
+<script>
+    var recurringReminderRecordId = [];
+    function getPUCRecordModelData() {
+        return { id: @Model.Id }
+    }
+</script>

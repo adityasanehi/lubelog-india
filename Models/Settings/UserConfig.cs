@@ -22,6 +22,7 @@
         public bool AutomaticDecimalFormat { get; set; }
         public string PreferredGasUnit { get; set; } = string.Empty;
         public string PreferredGasMileageUnit { get; set; } = string.Empty;
+        public string PreferredCurrencySymbol { get; set; } = string.Empty;
         public bool UseUnitForFuelCost { get; set; }
         public bool ShowCalendar { get; set; }
         public bool ShowVehicleThumbnail { get; set; }
@@ -32,15 +33,17 @@
         public string UserNameHash { get; set; } = string.Empty;
         public string UserPasswordHash { get; set; } = string.Empty;
         public string UserLanguage { get; set; } = "en_US";
-        public List<ImportMode> VisibleTabs { get; set; } = new List<ImportMode>() { 
+        public List<ImportMode> VisibleTabs { get; set; } = new List<ImportMode>() {
             ImportMode.Dashboard,
-            ImportMode.ServiceRecord, 
-            ImportMode.RepairRecord, 
-            ImportMode.GasRecord, 
-            ImportMode.UpgradeRecord, 
-            ImportMode.TaxRecord, 
-            ImportMode.ReminderRecord, 
-            ImportMode.NoteRecord
+            ImportMode.ServiceRecord,
+            ImportMode.RepairRecord,
+            ImportMode.GasRecord,
+            ImportMode.UpgradeRecord,
+            ImportMode.TaxRecord,
+            ImportMode.ReminderRecord,
+            ImportMode.NoteRecord,
+            ImportMode.InsuranceRecord,
+            ImportMode.PUCRecord
         };
         public ImportMode DefaultTab { get; set; } = ImportMode.Dashboard;
         public List<ImportMode> TabOrder { get; set; } = new List<ImportMode>() {
@@ -56,7 +59,9 @@
             ImportMode.NoteRecord,
             ImportMode.InspectionRecord,
             ImportMode.EquipmentRecord,
-            ImportMode.ReminderRecord
+            ImportMode.ReminderRecord,
+            ImportMode.InsuranceRecord,
+            ImportMode.PUCRecord
         };
     }
 }

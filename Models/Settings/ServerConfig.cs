@@ -90,6 +90,18 @@ namespace CarCareTracker.Models
         [JsonPropertyName("NotificationConfig")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public NotificationConfig? NotificationConfig { get; set; }
+
+        [JsonPropertyName("VAPID_PUBLIC_KEY")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? VapidPublicKey { get; set; }
+
+        [JsonPropertyName("VAPID_PRIVATE_KEY")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? VapidPrivateKey { get; set; }
+
+        [JsonPropertyName("VAPID_SUBJECT")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? VapidSubject { get; set; }
         [JsonPropertyName("Kestrel")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public KestrelAppConfig? KestrelAppConfig { get; set; }

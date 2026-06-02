@@ -29,5 +29,8 @@ namespace CarCareTracker.Models
         public NotificationConfig NotificationConfig { get; set; } = new NotificationConfig();
         public List<SkippedSetting> SkippedSettings { get; set; } = new List<SkippedSetting>();
         public bool ResizeThumbnail { get; set; }
+        public string VapidPublicKey { get; set; } = string.Empty;
+        public string VapidPrivateKey { get; set; } = string.Empty;
+        public string VapidSubject { get; set; } = string.Empty;
     }
 }
