@@ -327,7 +327,6 @@ namespace CarCareTracker.Logic
                         if (_config.GetWebPushEnabled())
                         {
                             var userIds = _userAccessDataAccess.GetUserAccessByVehicleId(vehicle.Id).Select(x => x.Id.UserId).ToList();
-                            var serverDomain = _config.GetServerDomain();
                             foreach (ReminderRecordViewModel reminderToSend in groupedNotification)
                             {
                                 string pushTitle = $"{vehicle.Year} {vehicle.Make} {vehicle.Model}";
