@@ -23,9 +23,9 @@
                     <input type="text" id="insuranceInsurerName" class="form-control" placeholder="@translator.Translate(userLanguage, "Insurance company name")" value="@Model.InsurerName">
                     <label for="insurancePolicyType">@translator.Translate(userLanguage, "Policy Type")</label>
                     <select class="form-select" id="insurancePolicyType">
-                        <option value="Comprehensive" @(Model.PolicyType == "Comprehensive" ? "selected" : "")>@translator.Translate(userLanguage, "Comprehensive")</option>
-                        <option value="ThirdParty" @(Model.PolicyType == "ThirdParty" ? "selected" : "")>@translator.Translate(userLanguage, "Third Party")</option>
-                        <option value="OwnDamage" @(Model.PolicyType == "OwnDamage" ? "selected" : "")>@translator.Translate(userLanguage, "Own Damage")</option>
+                        <!option value="Comprehensive" @(Model.PolicyType == "Comprehensive" ? "selected" : "")>@translator.Translate(userLanguage, "Comprehensive")</!option>
+                        <!option value="ThirdParty" @(Model.PolicyType == "ThirdParty" ? "selected" : "")>@translator.Translate(userLanguage, "Third Party")</!option>
+                        <!option value="OwnDamage" @(Model.PolicyType == "OwnDamage" ? "selected" : "")>@translator.Translate(userLanguage, "Own Damage")</!option>
                     </select>
                     <label for="insurancePremium">@translator.Translate(userLanguage, "Premium")</label>
                     <input type="text" inputmode="decimal" onkeydown="interceptDecimalKeys(event)" onkeyup="fixDecimalInput(this, 2)" id="insurancePremium" class="form-control" placeholder="@translator.Translate(userLanguage, "Premium amount")" value="@(isNew ? "" : Model.Premium)">
