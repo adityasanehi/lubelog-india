@@ -217,6 +217,14 @@
                         <input onChange="updateSettings()" class="form-check-input me-1" type="checkbox" value="InspectionRecord" id="inspectionRecordTab" @(Model.UserConfig.VisibleTabs.Contains(ImportMode.InspectionRecord) ? "checked" : "")>
                         <label class="form-check-label stretched-link" for="inspectionRecordTab">@translator.Translate(userLanguage, "Inspections")</label>
                     </li>
+                    <li class="list-group-item">
+                        <input onChange="updateSettings()" class="form-check-input me-1" type="checkbox" value="InsuranceRecord" id="insuranceRecordTab" @(Model.UserConfig.VisibleTabs.Contains(ImportMode.InsuranceRecord) ? "checked" : "")>
+                        <label class="form-check-label stretched-link" for="insuranceRecordTab">@translator.Translate(userLanguage, "Insurance")</label>
+                    </li>
+                    <li class="list-group-item">
+                        <input onChange="updateSettings()" class="form-check-input me-1" type="checkbox" value="PUCRecord" id="pucRecordTab" @(Model.UserConfig.VisibleTabs.Contains(ImportMode.PUCRecord) ? "checked" : "")>
+                        <label class="form-check-label stretched-link" for="pucRecordTab">@translator.Translate(userLanguage, "PUC")</label>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -237,6 +245,8 @@
                     <!option @(StaticHelper.DefaultTabSelected(Model.UserConfig, ImportMode.OdometerRecord)) value="OdometerRecord">@translator.Translate(userLanguage, "Odometer")</!option>
                     <!option @(StaticHelper.DefaultTabSelected(Model.UserConfig, ImportMode.InspectionRecord)) value="InspectionRecord">@translator.Translate(userLanguage, "Inspections")</!option>
                     <!option @(StaticHelper.DefaultTabSelected(Model.UserConfig, ImportMode.EquipmentRecord)) value="EquipmentRecord">@translator.Translate(userLanguage, "Equipment")</!option>
+                    <!option @(StaticHelper.DefaultTabSelected(Model.UserConfig, ImportMode.InsuranceRecord)) value="InsuranceRecord">@translator.Translate(userLanguage, "Insurance")</!option>
+                    <!option @(StaticHelper.DefaultTabSelected(Model.UserConfig, ImportMode.PUCRecord)) value="PUCRecord">@translator.Translate(userLanguage, "PUC")</!option>
                 </select>
             </div>
             <div class="col-12 col-md-6">
