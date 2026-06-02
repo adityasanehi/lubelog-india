@@ -232,6 +232,7 @@
             if (!btn) return;
             btn.textContent = subscribed ? 'Disable Push Notifications' : 'Enable Push Notifications';
             btn.dataset.subscribed = subscribed ? 'true' : 'false';
+            localStorage.setItem('pushSubscribed', subscribed ? 'true' : 'false');
         }
         function togglePushNotifications() {
             var btn = document.getElementById('pushToggleBtn');
@@ -241,19 +242,27 @@
                 subscribeToPush();
             }
         }
-        // Initialise push button state on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        function refreshPushButtonState() {
             var btn = document.getElementById('pushToggleBtn');
+            if (!btn) return;
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                if (btn) btn.style.display = 'none';
+                btn.style.display = 'none';
                 return;
             }
+            // Apply cached state immediately to avoid flash
+            var cached = localStorage.getItem('pushSubscribed');
+            if (cached !== null) updatePushButtonState(cached === 'true');
+            // Then verify with actual subscription
             navigator.serviceWorker.ready.then(function(reg) {
                 reg.pushManager.getSubscription().then(function(sub) {
                     updatePushButtonState(!!sub);
                 });
             });
-        });
+        }
+        // Run on full page load
+        document.addEventListener('DOMContentLoaded', refreshPushButtonState);
+        // Re-run whenever the settings tab content is injected via AJAX
+        document.addEventListener('pushButtonReady', refreshPushButtonState);
     </script>
 </head>
 <body>

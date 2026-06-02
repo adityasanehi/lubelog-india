@@ -1,5 +1,6 @@
 using CarCareTracker.External.Interfaces;
 using CarCareTracker.Helper;
+using CarCareTracker.Logic;
 using CarCareTracker.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,13 @@ namespace CarCareTracker.Controllers
     {
         private readonly IPushSubscriptionDataAccess _pushSubscriptionDataAccess;
         private readonly IConfigHelper _config;
+        private readonly INotificationLogic _notificationLogic;
 
-        public PushController(IPushSubscriptionDataAccess pushSubscriptionDataAccess, IConfigHelper config)
+        public PushController(IPushSubscriptionDataAccess pushSubscriptionDataAccess, IConfigHelper config, INotificationLogic notificationLogic)
         {
             _pushSubscriptionDataAccess = pushSubscriptionDataAccess;
             _config = config;
+            _notificationLogic = notificationLogic;
         }
 
         private int GetUserID() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "-1");
@@ -63,6 +66,19 @@ namespace CarCareTracker.Controllers
             }
             var result = _pushSubscriptionDataAccess.DeleteSubscriptionByEndpoint(input.Endpoint);
             return Json(OperationResponse.Conditional(result, "Unsubscribed"));
+        }
+
+        [HttpPost]
+        [Route("/api/push/test")]
+        public async Task<IActionResult> TestPush()
+        {
+            var userId = GetUserID();
+            var subs = _pushSubscriptionDataAccess.GetSubscriptionsByUserId(userId);
+            if (!subs.Any())
+                return Json(OperationResponse.Failed("No push subscriptions found for your account. Enable push notifications first."));
+            var serverDomain = _config.GetServerDomain();
+            await _notificationLogic.SendWebPushToUsers(new List<int> { userId }, "LubeLogger Test", "Push notifications are working!", serverDomain);
+            return Json(OperationResponse.Succeed("Test notification sent"));
         }
     }
 

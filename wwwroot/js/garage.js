@@ -22,6 +22,7 @@ function loadGarage() {
 function loadSettings() {
     $.get('/Home/Settings', function (data) {
         $("#settings-tab-pane").html(data);
+        document.dispatchEvent(new Event('pushButtonReady'));
     });
 }
 function getVehicleSupplyRecords() {
