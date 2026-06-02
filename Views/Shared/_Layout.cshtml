@@ -187,10 +187,7 @@
             return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
         }
         function subscribeToPush() {
-            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                alert('Push notifications are not supported in this browser.');
-                return;
-            }
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
             getVapidPublicKey().then(function(config) {
                 if (!config.enabled) { alert('Web Push is not configured on this server.'); return; }
                 Notification.requestPermission().then(function(permission) {
@@ -246,7 +243,11 @@
         }
         // Initialise push button state on page load
         document.addEventListener('DOMContentLoaded', function() {
-            if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+            var btn = document.getElementById('pushToggleBtn');
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                if (btn) btn.style.display = 'none';
+                return;
+            }
             navigator.serviceWorker.ready.then(function(reg) {
                 reg.pushManager.getSubscription().then(function(sub) {
                     updatePushButtonState(!!sub);
