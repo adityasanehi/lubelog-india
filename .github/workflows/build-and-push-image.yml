@@ -26,7 +26,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: "${{ secrets.DH_USER }}"
+          username: "adityasanehi"
           password: "${{ secrets.GHCR_PAT }}"
 
       - name: Docker Metadata
@@ -36,7 +36,7 @@ jobs:
           context: workflow
           images: |
             ${{ secrets.DH_USER }}/lubelog-india
-            ghcr.io/${{ secrets.DH_USER }}/lubelog-india
+            ghcr.io/adityasanehi/lubelog-india
           tags: |
             type=edge,branch=main
             type=ref,event=tag
