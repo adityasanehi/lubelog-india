@@ -45,8 +45,6 @@ function savePUCRecordToVehicle(isEdit) {
         return;
     }
 
-    var pendingFiles = getPendingFiles();
-    var existingFiles = getExistingFiles();
     var pucRecordId = isEdit ? getPUCRecordModelData().id : 0;
 
     var pucRecordInput = {
@@ -57,18 +55,12 @@ function savePUCRecordToVehicle(isEdit) {
         testDate: testDate,
         expiryDate: expiryDate,
         notes: notes,
-        files: existingFiles,
+        files: uploadedFiles,
         tags: tags ? tags : [],
         reminderRecordId: reminderRecordId
     };
 
-    if (pendingFiles.length > 0) {
-        uploadFilesAndSave(pendingFiles, pucRecordInput, '/Vehicle/SavePUCRecordToVehicleId', function (updatedInput) {
-            doSavePUC(updatedInput, isEdit);
-        });
-    } else {
-        doSavePUC(pucRecordInput, isEdit);
-    }
+    doSavePUC(pucRecordInput, isEdit);
 
     if (!isEdit && $("#addPUCReminderCheck").is(':checked')) {
         addReminderForPUC(vehicleId, certificateNumber, expiryDate);

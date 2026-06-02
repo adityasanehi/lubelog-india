@@ -51,8 +51,6 @@ function saveInsuranceRecordToVehicle(isEdit) {
         return;
     }
 
-    var pendingFiles = getPendingFiles();
-    var existingFiles = getExistingFiles();
     var insuranceRecordId = isEdit ? getInsuranceRecordModelData().id : 0;
 
     var insuranceRecordInput = {
@@ -65,18 +63,12 @@ function saveInsuranceRecordToVehicle(isEdit) {
         startDate: startDate,
         expiryDate: expiryDate,
         notes: notes,
-        files: existingFiles,
+        files: uploadedFiles,
         tags: tags ? tags : [],
         reminderRecordId: reminderRecordId
     };
 
-    if (pendingFiles.length > 0) {
-        uploadFilesAndSave(pendingFiles, insuranceRecordInput, '/Vehicle/SaveInsuranceRecordToVehicleId', function (updatedInput) {
-            doSaveInsurance(updatedInput, isEdit);
-        });
-    } else {
-        doSaveInsurance(insuranceRecordInput, isEdit);
-    }
+    doSaveInsurance(insuranceRecordInput, isEdit);
 
     if (!isEdit && $("#addInsuranceReminderCheck").is(':checked')) {
         addReminderForInsurance(vehicleId, policyNumber, expiryDate);
