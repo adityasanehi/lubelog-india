@@ -8,7 +8,7 @@ namespace CarCareTracker.Models
         public string CertificateNumber { get; set; } = string.Empty;
         public string TestCenter { get; set; } = string.Empty;
         public string TestDate { get; set; } = DateTime.Now.ToShortDateString();
-        public string ExpiryDate { get; set; } = DateTime.Now.AddMonths(6).ToShortDateString();
+        public string ExpiryDate { get; set; } = DateTime.Now.AddYears(1).ToShortDateString();
         public string Notes { get; set; } = string.Empty;
         public List<UploadedFiles> Files { get; set; } = new List<UploadedFiles>();
         public List<string> Tags { get; set; } = new List<string>();

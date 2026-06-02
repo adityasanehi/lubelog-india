@@ -95,7 +95,7 @@ function addReminderForPUC(vehicleId, certificateNumber, expiryDate) {
         date: expiryDate,
         metric: "Date",
         isRecurring: true,
-        reminderMonthInterval: "SixMonths"
+        reminderMonthInterval: "OneYear"
     };
     $.post('/Vehicle/SaveReminderRecordToVehicleId', reminderData);
 }
