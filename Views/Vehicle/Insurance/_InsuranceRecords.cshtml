@@ -74,7 +74,7 @@
                             @record.ExpiryDate.ToShortDateString()
                             @if (!isCurrent)
                             {
-                                <span class="badge bg-secondary ms-1">@translator.Translate(userLanguage, "Archived")</span>
+                                <span class="badge bg-secondary ms-1 align-middle">@translator.Translate(userLanguage, "Archived")</span>
                             }
                             else if (isExpired)
                             {
