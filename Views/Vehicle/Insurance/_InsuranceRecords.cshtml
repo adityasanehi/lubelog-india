@@ -70,19 +70,19 @@
                         <td data-label="@translator.Translate(userLanguage, "Type")" class="col-2 flex-grow-1 text-truncate">@translator.Translate(userLanguage, record.PolicyType.ToString())</td>
                         <td data-label="@translator.Translate(userLanguage, "Premium")" class="col-2 flex-grow-1 text-truncate" data-record-type="cost">@record.Premium.ToString("C")</td>
                         <td data-label="@translator.Translate(userLanguage, "Start Date")" class="col-2 flex-grow-1 text-truncate">@record.StartDate.ToShortDateString()</td>
-                        <td data-label="@translator.Translate(userLanguage, "Expiry Date")" class="col-2 flex-grow-1 text-truncate">
-                            @record.ExpiryDate.ToShortDateString()
+                        <td data-label="@translator.Translate(userLanguage, "Expiry Date")" class="col-2 flex-grow-1 d-flex align-items-center gap-1 flex-wrap">
+                            <span>@record.ExpiryDate.ToShortDateString()</span>
                             @if (!isCurrent)
                             {
-                                <span class="badge bg-secondary ms-1 align-middle">@translator.Translate(userLanguage, "Archived")</span>
+                                <span class="badge bg-secondary">@translator.Translate(userLanguage, "Archived")</span>
                             }
                             else if (isExpired)
                             {
-                                <span class="badge bg-danger ms-1">@translator.Translate(userLanguage, "Expired")</span>
+                                <span class="badge bg-danger">@translator.Translate(userLanguage, "Expired")</span>
                             }
                             else if (isExpiringSoon)
                             {
-                                <span class="badge bg-warning text-dark ms-1">@translator.Translate(userLanguage, "Expiring Soon")</span>
+                                <span class="badge bg-warning text-dark">@translator.Translate(userLanguage, "Expiring Soon")</span>
                             }
                         </td>
                     </tr>
