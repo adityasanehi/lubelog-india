@@ -31,6 +31,13 @@ namespace CarCareTracker.Controllers
                 foreach (int reminderRecordId in insuranceRecord.ReminderRecordId)
                     PushbackRecurringReminderRecordWithChecks(reminderRecordId, DateTime.Parse(insuranceRecord.ExpiryDate), null);
             }
+            // When adding a new record, clean up any existing insurance renewal reminders
+            if (insuranceRecord.Id == 0)
+            {
+                var existingReminders = _reminderRecordDataAccess.GetReminderRecordsByVehicleId(insuranceRecord.VehicleId);
+                foreach (var reminder in existingReminders.Where(x => x.Description.StartsWith("Insurance Renewal")))
+                    _reminderRecordDataAccess.DeleteReminderRecordById(reminder.Id);
+            }
             var record = insuranceRecord.ToInsuranceRecord();
             var result = _insuranceRecordDataAccess.SaveInsuranceRecordToVehicle(record);
             return Json(OperationResponse.Conditional(result, string.Empty, StaticHelper.GenericErrorMessage));

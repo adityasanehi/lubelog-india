@@ -8,6 +8,9 @@
     var recordTags = Model.SelectMany(x => x.Tags).Distinct();
 }
 @model List<InsuranceRecord>
+@{
+    var currentRecord = Model.OrderByDescending(x => x.ExpiryDate).FirstOrDefault();
+}
 <div class="d-flex flex-column vehicleTabPane">
 <div class="row">
     <div class="d-flex justify-content-between">
@@ -54,9 +57,11 @@
             <tbody>
                 @foreach (InsuranceRecord record in Model)
                 {
+                    var isCurrent = currentRecord != null && record.Id == currentRecord.Id;
                     var isExpired = record.ExpiryDate < DateTime.Now;
                     var isExpiringSoon = !isExpired && record.ExpiryDate < DateTime.Now.AddDays(30);
-                    <tr class="d-flex user-select-none @(isExpired ? "table-danger" : isExpiringSoon ? "table-warning" : "")"
+                    var rowClass = !isCurrent ? "text-muted" : (isExpired ? "table-danger" : isExpiringSoon ? "table-warning" : "");
+                    <tr class="d-flex user-select-none @rowClass"
                         style="cursor:pointer;"
                         onclick="showEditInsuranceRecordModal(@record.Id)"
                         data-tags='@string.Join(" ", record.Tags)'>
@@ -67,7 +72,11 @@
                         <td data-label="@translator.Translate(userLanguage, "Start Date")" class="col-2 flex-grow-1 text-truncate">@record.StartDate.ToShortDateString()</td>
                         <td data-label="@translator.Translate(userLanguage, "Expiry Date")" class="col-2 flex-grow-1 text-truncate">
                             @record.ExpiryDate.ToShortDateString()
-                            @if (isExpired)
+                            @if (!isCurrent)
+                            {
+                                <span class="badge bg-secondary ms-1">@translator.Translate(userLanguage, "Archived")</span>
+                            }
+                            else if (isExpired)
                             {
                                 <span class="badge bg-danger ms-1">@translator.Translate(userLanguage, "Expired")</span>
                             }

@@ -31,6 +31,13 @@ namespace CarCareTracker.Controllers
                 foreach (int reminderRecordId in pucRecord.ReminderRecordId)
                     PushbackRecurringReminderRecordWithChecks(reminderRecordId, DateTime.Parse(pucRecord.ExpiryDate), null);
             }
+            // When adding a new record, clean up any existing PUC renewal reminders
+            if (pucRecord.Id == 0)
+            {
+                var existingReminders = _reminderRecordDataAccess.GetReminderRecordsByVehicleId(pucRecord.VehicleId);
+                foreach (var reminder in existingReminders.Where(x => x.Description.StartsWith("PUC Renewal")))
+                    _reminderRecordDataAccess.DeleteReminderRecordById(reminder.Id);
+            }
             var record = pucRecord.ToPUCRecord();
             var result = _pucRecordDataAccess.SavePUCRecordToVehicle(record);
             return Json(OperationResponse.Conditional(result, string.Empty, StaticHelper.GenericErrorMessage));
