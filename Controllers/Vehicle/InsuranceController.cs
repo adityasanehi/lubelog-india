@@ -13,10 +13,11 @@ namespace CarCareTracker.Controllers
         {
             var result = _insuranceRecordDataAccess.GetInsuranceRecordsByVehicleId(vehicleId);
             bool _useDescending = _config.GetUserConfig(User).UseDescending;
-            if (_useDescending)
-                result = result.OrderByDescending(x => x.ExpiryDate).ToList();
-            else
-                result = result.OrderBy(x => x.ExpiryDate).ToList();
+            // Current record (latest expiry) always first, remaining follow sort preference
+            var current = result.OrderByDescending(x => x.ExpiryDate).FirstOrDefault();
+            var rest = result.Where(x => x.Id != current?.Id);
+            rest = _useDescending ? rest.OrderByDescending(x => x.ExpiryDate) : rest.OrderBy(x => x.ExpiryDate);
+            result = current != null ? new[] { current }.Concat(rest).ToList() : rest.ToList();
             return PartialView("Insurance/_InsuranceRecords", result);
         }
 
