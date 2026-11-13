@@ -14,7 +14,7 @@ namespace CarCareTracker.Helper
     /// </summary>
     public static class StaticHelper
     {
-        public const string VersionNumber = "1.6.6";
+        public const string VersionNumber = "1.7.4";
         public const string DbName = "data/cartracker.db";
         public const string UserConfigPath = "data/config/userConfig.json";
         public const string ServerConfigPath = "data/config/serverConfig.json";
@@ -358,6 +358,11 @@ namespace CarCareTracker.Helper
             {
                 Directory.CreateDirectory("data/translations");
                 Console.WriteLine("Created translations directory");
+            }
+            if (!Directory.Exists("data/themes"))
+            {
+                Directory.CreateDirectory("data/themes");
+                Console.WriteLine("Created themes directory");
             }
             if (!Directory.Exists("data/temp"))
             {
@@ -876,7 +881,7 @@ namespace CarCareTracker.Helper
             serializerOption.Converters.Add(new InvariantConverter());
             return serializerOption;
         }
-        public static void WriteGasRecordExportModel(CsvWriter _csv, IEnumerable<GasRecordExportModel> genericRecords)
+        public static void WriteGasRecordExportModel(CsvWriter _csv, IEnumerable<GasRecordExportModel> genericRecords, bool writeElectric)
         {
             var extraHeaders = genericRecords.SelectMany(x => x.ExtraFields).Select(y => y.Name).Distinct();
             //write headers
@@ -887,6 +892,11 @@ namespace CarCareTracker.Helper
             _csv.WriteField(nameof(GasRecordExportModel.FuelEconomy));
             _csv.WriteField(nameof(GasRecordExportModel.IsFillToFull));
             _csv.WriteField(nameof(GasRecordExportModel.MissedFuelUp));
+            if (writeElectric)
+            {
+                _csv.WriteField(nameof(GasRecordExportModel.StartingSoc));
+                _csv.WriteField(nameof(GasRecordExportModel.EndingSoc));
+            }
             _csv.WriteField(nameof(GasRecordExportModel.Notes));
             _csv.WriteField(nameof(GasRecordExportModel.Tags));
             foreach (string extraHeader in extraHeaders)
@@ -903,6 +913,11 @@ namespace CarCareTracker.Helper
                 _csv.WriteField(genericRecord.FuelEconomy);
                 _csv.WriteField(genericRecord.IsFillToFull);
                 _csv.WriteField(genericRecord.MissedFuelUp);
+                if (writeElectric)
+                {
+                    _csv.WriteField(genericRecord.StartingSoc);
+                    _csv.WriteField(genericRecord.EndingSoc);
+                }
                 _csv.WriteField(genericRecord.Notes);
                 _csv.WriteField(genericRecord.Tags);
                 foreach (string extraHeader in extraHeaders)
@@ -982,6 +997,11 @@ namespace CarCareTracker.Helper
         public static JsonSerializerOptions GetNoEncodingOption()
         {
             JsonSerializerOptions serializerOption = new JsonSerializerOptions { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
+            return serializerOption;
+        }
+        public static JsonSerializerOptions GetAPIDocumentationSerializerOption()
+        {
+            JsonSerializerOptions serializerOption = new JsonSerializerOptions { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All), WriteIndented = true };
             return serializerOption;
         }
         public static string GetAPIMethodColor(APIMethodType method)
@@ -1097,7 +1117,11 @@ namespace CarCareTracker.Helper
         }
         public static bool GetPathAllowAPIKeyAuth(PathString path)
         {
-            return path.StartsWithSegments("/api") || path.StartsWithSegments("/kiosk") || path.StartsWithSegments("/images") || path.StartsWithSegments("/documents");
+            return path.StartsWithSegments("/api") || path.StartsWithSegments("/kiosk") || path.StartsWithSegments("/images") || path.StartsWithSegments("/documents") || path.StartsWithSegments("/temp");
+        }
+        public static string GetStaticModalAttribute(bool enablePersistentDialog)
+        {
+            return enablePersistentDialog ? "data-bs-backdrop=static data-bs-keyboard=false" : string.Empty;
         }
     }
 }

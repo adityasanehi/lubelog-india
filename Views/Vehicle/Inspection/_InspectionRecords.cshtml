@@ -140,19 +140,19 @@
 </div>
 </div>
 
-<div class="modal fade" data-bs-focus="false" id="inspectionRecordModal" tabindex="-1" role="dialog" aria-hidden="true" onpaste="handleModalPaste(event)">
+<div class="modal fade" data-bs-focus="false" id="inspectionRecordModal" tabindex="-1" role="dialog" aria-hidden="true" onpaste="handleModalPaste(event)" @StaticHelper.GetStaticModalAttribute(userConfig.EnablePersistentDialog)>
     <div class="modal-dialog" role="document">
         <div class="modal-content" id="inspectionRecordModalContent">
         </div>
     </div>
 </div>
-<div class="modal fade" data-bs-focus="false" id="inspectionRecordTemplateModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" data-bs-focus="false" id="inspectionRecordTemplateModal" tabindex="-1" role="dialog" aria-hidden="true" @StaticHelper.GetStaticModalAttribute(userConfig.EnablePersistentDialog)>
     <div class="modal-dialog" role="document">
         <div class="modal-content" id="inspectionRecordTemplateModalContent">
         </div>
     </div>
 </div>
-<div class="modal fade" data-bs-focus="false" id="inspectionRecordTemplateEditModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" data-bs-focus="false" id="inspectionRecordTemplateEditModal" tabindex="-1" role="dialog" aria-hidden="true" @StaticHelper.GetStaticModalAttribute(userConfig.EnablePersistentDialog)>
     <div class="modal-dialog" role="document">
         <div class="modal-content" id="inspectionRecordTemplateEditModalContent">
         </div>

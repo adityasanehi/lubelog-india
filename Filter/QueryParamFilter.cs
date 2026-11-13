@@ -11,47 +11,56 @@ namespace CarCareTracker.Filter
         {
             _queryParams = queryParams;
         }
-        public override async void OnActionExecuting(ActionExecutingContext filterContext)
+        public override async Task OnActionExecutionAsync(ActionExecutingContext filterContext, ActionExecutionDelegate next)
         {
-            Dictionary<string, string> paramDictionary = new Dictionary<string, string>{
-                { "vehicleId", "int"},
-                { "autoIncludeEquipment", "bool" }
-            };
-            if (_queryParams.Any(x => !filterContext.ActionArguments.ContainsKey(x)))
+            try
             {
-                filterContext.HttpContext.Request.Body.Position = 0;
-                var reader = new StreamReader(filterContext.HttpContext.Request.Body, Encoding.UTF8);
-                var rawMessage = await reader.ReadToEndAsync();
-                if (!string.IsNullOrWhiteSpace(rawMessage))
+                Dictionary<string, string> paramDictionary = new Dictionary<string, string>{
+                    { "vehicleId", "int"},
+                    { "autoIncludeEquipment", "bool" }
+                };
+                if (_queryParams.Any(x => !filterContext.ActionArguments.ContainsKey(x)))
                 {
-                    Dictionary<string, object> dynamicDictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(rawMessage) ?? new Dictionary<string, object>();
-                    foreach (string queryParam in _queryParams)
+                    filterContext.HttpContext.Request.Body.Position = 0;
+                    using var reader = new StreamReader(filterContext.HttpContext.Request.Body, Encoding.UTF8, leaveOpen: true);
+                    var rawMessage = await reader.ReadToEndAsync();
+                    if (!string.IsNullOrWhiteSpace(rawMessage))
                     {
-                        if (!filterContext.ActionArguments.ContainsKey(queryParam) && dynamicDictionary.ContainsKey(queryParam))
+                        Dictionary<string, object> dynamicDictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(rawMessage) ?? new Dictionary<string, object>();
+                        foreach (string queryParam in _queryParams)
                         {
-                            if (paramDictionary.TryGetValue(queryParam, out string queryParamType))
+                            if (!filterContext.ActionArguments.ContainsKey(queryParam) && dynamicDictionary.ContainsKey(queryParam))
                             {
-                                if (queryParamType == "int")
+                                if (paramDictionary.TryGetValue(queryParam, out string queryParamType))
                                 {
-                                    filterContext.ActionArguments.Add(queryParam, int.Parse(dynamicDictionary[queryParam].ToString()));
-                                }
-                                else if (queryParamType == "bool")
-                                {
-                                    filterContext.ActionArguments.Add(queryParam, bool.Parse(dynamicDictionary[queryParam].ToString()));
+                                    if (queryParamType == "int")
+                                    {
+                                        filterContext.ActionArguments.Add(queryParam, int.Parse(dynamicDictionary[queryParam].ToString()));
+                                    }
+                                    else if (queryParamType == "bool")
+                                    {
+                                        filterContext.ActionArguments.Add(queryParam, bool.Parse(dynamicDictionary[queryParam].ToString()));
+                                    }
+                                    else
+                                    {
+                                        filterContext.ActionArguments.Add(queryParam, dynamicDictionary[queryParam].ToString());
+                                    }
                                 }
                                 else
                                 {
                                     filterContext.ActionArguments.Add(queryParam, dynamicDictionary[queryParam].ToString());
                                 }
                             }
-                            else
-                            {
-                                filterContext.ActionArguments.Add(queryParam, dynamicDictionary[queryParam].ToString());
-                            }
                         }
                     }
                 }
             }
+            catch (Exception ex) when (ex is JsonException or FormatException or OverflowException)
+            {
+                filterContext.Result = new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(CarCareTracker.Models.OperationResponse.Failed("Invalid API parameters"));
+                return;
+            }
+            await next();
         }
     }
 }

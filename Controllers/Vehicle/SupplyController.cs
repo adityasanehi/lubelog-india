@@ -43,32 +43,13 @@ namespace CarCareTracker.Controllers
             {
                 //get supply record.
                 var result = _supplyRecordDataAccess.GetSupplyRecordById(supply.SupplyId);
-                var unitCost = (result.Quantity != 0) ? result.Cost / result.Quantity : 0;
-                //deduct quantity used.
-                result.Quantity -= supply.Quantity;
-                //deduct cost.
-                result.Cost -= (supply.Quantity * unitCost);
-                //check decimal places to ensure that it always has a max of 3 decimal places.
-                var roundedDecimal = decimal.Round(result.Cost, 3);
-                if (roundedDecimal != result.Cost)
+                //security check
+                if (result.VehicleId != default && !_userLogic.UserCanEditVehicle(GetUserID(), result.VehicleId, HouseholdPermission.Edit))
                 {
-                    //Too many decimals
-                    result.Cost = roundedDecimal;
+                    return results;
                 }
-                //create new requisitionrrecord
-                var requisitionRecord = new SupplyUsageHistory
-                {
-                    Id = supply.SupplyId,
-                    Date = dateRequisitioned,
-                    Description = usageDescription,
-                    Quantity = supply.Quantity,
-                    Cost = (supply.Quantity * unitCost)
-                };
-                result.RequisitionHistory.Add(requisitionRecord);
-                //save
+                var requisitionRecord = SupplyRequisition.Apply(result, supply.Quantity, dateRequisitioned, usageDescription);
                 _supplyRecordDataAccess.SaveSupplyRecordToVehicle(result);
-                requisitionRecord.Description = result.Description; //change the name of the description for plan/service/repair/upgrade records
-                requisitionRecord.PartNumber = result.PartNumber; //populate part number if not displayed in supplies modal.
                 results.Add(requisitionRecord);
             }
             return results;
@@ -97,6 +78,10 @@ namespace CarCareTracker.Controllers
             var planRecordTemplate = _planRecordTemplateDataAccess.GetPlanRecordTemplateById(planRecordTemplateId);
             if (planRecordTemplate != default && planRecordTemplate.VehicleId != default)
             {
+                if (!_userLogic.UserCanEditVehicle(GetUserID(), planRecordTemplate.VehicleId, HouseholdPermission.View))
+                {
+                    return Json(OperationResponse.Failed("Access Denied"));
+                }
                 var supplies = _supplyRecordDataAccess.GetSupplyRecordsByVehicleId(planRecordTemplate.VehicleId);
                 if (_config.GetServerEnableShopSupplies())
                 {
@@ -180,12 +165,12 @@ namespace CarCareTracker.Controllers
                 //security check only if not editing shop supply.
                 if (!_userLogic.UserCanEditVehicle(GetUserID(), result.VehicleId, HouseholdPermission.View))
                 {
-                    return Redirect("/Error/Unauthorized");
+                    return Forbid();
                 }
             }
             else if (!_config.GetServerEnableShopSupplies())
             {
-                return Redirect("/Error/Unauthorized");
+                return Forbid();
             }
             if (result.RequisitionHistory.Any())
             {

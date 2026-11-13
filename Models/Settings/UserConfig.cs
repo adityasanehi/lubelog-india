@@ -1,4 +1,4 @@
-﻿namespace CarCareTracker.Models
+namespace CarCareTracker.Models
 {
     public class UserConfig
     {
@@ -28,11 +28,14 @@
         public bool ShowVehicleThumbnail { get; set; }
         public bool ShowSearch { get; set; }
         public bool DisableAutoZoom { get; set; }
+        public bool EnablePersistentDialog { get; set; }
         public bool UseGridInMobile { get; set; }
+        public bool EnableNotesColumnWrap { get; set; }
         public List<UserColumnPreference> UserColumnPreferences { get; set; } = new List<UserColumnPreference>();
         public string UserNameHash { get; set; } = string.Empty;
         public string UserPasswordHash { get; set; } = string.Empty;
         public string UserLanguage { get; set; } = "en_US";
+        public string UserTheme { get; set; } = string.Empty;
         public List<ImportMode> VisibleTabs { get; set; } = new List<ImportMode>() {
             ImportMode.Dashboard,
             ImportMode.ServiceRecord,

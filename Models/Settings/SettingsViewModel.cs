@@ -4,5 +4,6 @@ namespace CarCareTracker.Models
     {
         public UserConfig UserConfig { get; set; }
         public List<string> UILanguages { get; set; } = new List<string>();
+        public List<string> UIThemes { get; set; } = new List<string>();
     }
 }

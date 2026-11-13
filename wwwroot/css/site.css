@@ -707,22 +707,13 @@ html[data-bs-theme="light"] .api-method:hover {
 .setup-wizard-container {
     position: relative;
     box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24);
-    height: 85vh;
+    height: calc(100dvh - 48px - 3.5rem);
 }
 
 .setup-wizard-content {
-    height: calc(100% - 60px);
     overflow-y: auto;
     overflow-x: hidden;
     padding: 10px 15px;
-}
-
-.setup-wizard-nav {
-    position: absolute;
-    width: 100%;
-    height: 60px;
-    bottom: 0;
-    border-top: #E6E6E6 solid 1px;
 }
 
 html[data-bs-theme="dark"] .frosted {
@@ -889,4 +880,64 @@ html[data-bs-theme="dark"] .swal2-validation-message {
 }
 .break-all{
     overflow-wrap: anywhere;
+}
+
+.dual-range {
+    position: relative;
+    height: 2.25rem;
+    width: 100%;
+}
+
+.dual-range::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #dee2e6;
+    border-radius: 2px;
+    transform: translateY(-50%);
+}
+
+.dual-range-highlight {
+    position: absolute;
+    top: 50%;
+    height: 4px;
+    background: #0d6efd;
+    border-radius: 2px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.dual-range input[type="range"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2.25rem;
+    margin: 0;
+    background: transparent;
+    pointer-events: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.dual-range input[type="range"]::-webkit-slider-thumb {
+    pointer-events: auto;
+}
+
+.dual-range input[type="range"]::-moz-range-thumb {
+    pointer-events: auto;
+}
+
+.dual-range input[type="range"]::-webkit-slider-runnable-track {
+    background: transparent;
+}
+
+.dual-range input[type="range"]::-moz-range-track {
+    background: transparent;
+}
+.dual-range input[type="range"].dual-range-top {
+    z-index: 3;
 }

@@ -1,5 +1,9 @@
 ﻿@using CarCareTracker.Helper
+@inject IConfigHelper config
 @model List<ReminderRecordViewModel>
+@{
+    var userConfig = config.GetUserConfig(User);
+}
 <script>
     var eventDates = [];
     var groupedDates = [];
@@ -8,13 +12,15 @@
         @:eventDates.push({ id: @reminderRecord.Id, date: decodeHTMLEntities('@StaticHelper.GetEpochFromDateTime(reminderRecord.Date)'), description: decodeHTMLEntities('@reminderRecord.Description'), urgency: decodeHTMLEntities('@reminderRecord.Urgency.ToString()') });
     }
 </script>
-<div class="row vehicleDetailTabContainer">
-    <div class="col-12 reminderCalendarView">
-        <div class="reminderCalendarViewContent" style="height:60vh;">
+<div class="d-flex vehicleTabPane">
+    <div class="row vehicleDetailTabContainer">
+        <div class="col-12 reminderCalendarView d-flex flex-column">
+            <div class="reminderCalendarViewContent flex-grow-1">
+            </div>
         </div>
     </div>
 </div>
-<div class="modal fade" data-bs-focus="false" id="reminderRecordCalendarModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" data-bs-focus="false" id="reminderRecordCalendarModal" tabindex="-1" role="dialog" aria-hidden="true" @StaticHelper.GetStaticModalAttribute(userConfig.EnablePersistentDialog)>
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content" id="reminderRecordCalendarModalContent">
         </div>

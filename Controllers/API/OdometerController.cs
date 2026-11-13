@@ -212,6 +212,7 @@ namespace CarCareTracker.Controllers
                     Tags = string.IsNullOrWhiteSpace(input.Tags) ? new List<string>() : input.Tags.Split(' ').Distinct().ToList(),
                     EquipmentRecordId = equipmentRecordId
                 };
+                if (IsDryRun) return Json(OperationResponse.Succeed("Validated; no writes", new { dryRun = true }));
                 _odometerRecordDataAccess.SaveOdometerRecordToVehicle(odometerRecord);
                 _eventLogic.PublishEvent(GetUserID(), WebHookPayload.FromOdometerRecord(odometerRecord, "odometerrecord.add.api", User.Identity?.Name ?? string.Empty));
                 return Json(OperationResponse.Succeed("Odometer Record Added", new { recordId = odometerRecord.Id }));
@@ -236,7 +237,7 @@ namespace CarCareTracker.Controllers
             //security check.
             if (!_userLogic.UserCanEditVehicle(GetUserID(), existingRecord.VehicleId, HouseholdPermission.Delete))
             {
-                Response.StatusCode = 401;
+                Response.StatusCode = 403;
                 return Json(OperationResponse.Failed("Access Denied, you don't have access to this vehicle."));
             }
             var result = _odometerRecordDataAccess.DeleteOdometerRecordById(existingRecord.Id);
@@ -281,7 +282,7 @@ namespace CarCareTracker.Controllers
                     //check if user has access to the vehicleId
                     if (!_userLogic.UserCanEditVehicle(GetUserID(), existingRecord.VehicleId, HouseholdPermission.Edit))
                     {
-                        Response.StatusCode = 401;
+                        Response.StatusCode = 403;
                         return Json(OperationResponse.Failed("Access Denied, you don't have access to this vehicle."));
                     }
                     var equipmentRecordId = new List<int>();

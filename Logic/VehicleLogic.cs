@@ -1,4 +1,4 @@
-﻿using CarCareTracker.External.Interfaces;
+using CarCareTracker.External.Interfaces;
 using CarCareTracker.Helper;
 using CarCareTracker.Models;
 
@@ -24,6 +24,7 @@ namespace CarCareTracker.Logic
         List<string> GetVehicleThumbnails(List<Vehicle> vehicles);
         List<string> GetVehicleDocuments(List<Vehicle> vehicles);
         List<string> GetStoreSupplyDocuments();
+        bool DeleteVehicleRecords(int vehicleId);
     }
     public class VehicleLogic: IVehicleLogic
     {
@@ -43,6 +44,8 @@ namespace CarCareTracker.Logic
         private readonly IInspectionRecordDataAccess _inspectionRecordDataAccess;
         private readonly IInspectionRecordTemplateDataAccess _inspectionRecordTemplateDataAccess;
         private readonly IEquipmentRecordDataAccess _equipmentRecordDataAccess;
+        private readonly IInsuranceRecordDataAccess _insuranceRecordDataAccess;
+        private readonly IPUCRecordDataAccess _pucRecordDataAccess;
         private readonly ILogger<VehicleLogic> _logger;
 
         public VehicleLogic(
@@ -62,6 +65,8 @@ namespace CarCareTracker.Logic
             IInspectionRecordDataAccess inspectionRecordDataAccess,
             IInspectionRecordTemplateDataAccess inspectionRecordTemplateDataAccess,
             IEquipmentRecordDataAccess equipmentRecordDataAccess,
+            IInsuranceRecordDataAccess insuranceRecordDataAccess,
+            IPUCRecordDataAccess pucRecordDataAccess,
             ILogger<VehicleLogic> logger
             ) {
             _serviceRecordDataAccess = serviceRecordDataAccess;
@@ -80,6 +85,8 @@ namespace CarCareTracker.Logic
             _inspectionRecordDataAccess = inspectionRecordDataAccess;
             _inspectionRecordTemplateDataAccess = inspectionRecordTemplateDataAccess;
             _equipmentRecordDataAccess = equipmentRecordDataAccess;
+            _insuranceRecordDataAccess = insuranceRecordDataAccess;
+            _pucRecordDataAccess = pucRecordDataAccess;
             _logger = logger;
         }
         public VehicleRecords GetVehicleRecords(int vehicleId)
@@ -617,6 +624,27 @@ namespace CarCareTracker.Logic
             List<string> vehicleDocuments = new List<string>();
             vehicleDocuments.AddRange(_supplyRecordDataAccess.GetSupplyRecordsByVehicleId(0).SelectMany(x => x.Files).Select(y => Path.GetFileName(y.Location)));
             return vehicleDocuments;
+        }
+        public bool DeleteVehicleRecords(int vehicleId)
+        {
+            var result = _gasRecordDataAccess.DeleteAllGasRecordsByVehicleId(vehicleId) &&
+                _serviceRecordDataAccess.DeleteAllServiceRecordsByVehicleId(vehicleId) &&
+                _collisionRecordDataAccess.DeleteAllCollisionRecordsByVehicleId(vehicleId) &&
+                _taxRecordDataAccess.DeleteAllTaxRecordsByVehicleId(vehicleId) &&
+                _noteDataAccess.DeleteAllNotesByVehicleId(vehicleId) &&
+                _reminderRecordDataAccess.DeleteAllReminderRecordsByVehicleId(vehicleId) &&
+                _upgradeRecordDataAccess.DeleteAllUpgradeRecordsByVehicleId(vehicleId) &&
+                _planRecordDataAccess.DeleteAllPlanRecordsByVehicleId(vehicleId) &&
+                _planRecordTemplateDataAccess.DeleteAllPlanRecordTemplatesByVehicleId(vehicleId) &&
+                _inspectionRecordDataAccess.DeleteAllInspectionRecordsByVehicleId(vehicleId) &&
+                _inspectionRecordTemplateDataAccess.DeleteAllInspectionReportTemplatesByVehicleId(vehicleId) &&
+                _equipmentRecordDataAccess.DeleteAllEquipmentRecordsByVehicleId(vehicleId) &&
+                _supplyRecordDataAccess.DeleteAllSupplyRecordsByVehicleId(vehicleId) &&
+                _odometerRecordDataAccess.DeleteAllOdometerRecordsByVehicleId(vehicleId) &&
+                _insuranceRecordDataAccess.DeleteAllInsuranceRecordsByVehicleId(vehicleId) &&
+                _pucRecordDataAccess.DeleteAllPUCRecordsByVehicleId(vehicleId) &&
+                _dataAccess.DeleteVehicle(vehicleId);
+            return result;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿function showExtraFieldModal() {
+function showExtraFieldModal() {
     $.get(`/Home/GetExtraFieldsModal?importMode=0`, function (data) {
         $("#extraFieldModalContent").html(data);
         $("#extraFieldModal").modal('show');
@@ -21,19 +21,13 @@ function deleteLanguage() {
         updateSettings();
     });
 }
-function updateColorModeSettings(e) {
-    var colorMode = $(e).prop("id");
-    switch (colorMode) {
-        case "enableDarkMode":
-            //uncheck system prefernce
-            $("#useSystemColorMode").prop('checked', false);
-            updateSettings();
-            break;
-        case "useSystemColorMode":
-            $("#enableDarkMode").prop('checked', false);
-            updateSettings();
-            break;
-    }
+function deleteTheme() {
+    var themeFileLocation = `/themes/${$("#defaultTheme").val()}.css`;
+    $.post('/Files/DeleteFiles', { fileLocation: themeFileLocation }, function (data) {
+        //reset user theme
+        $("#defaultTheme").val('');
+        updateSettings();
+    });
 }
 function updateSettings() {
     var visibleTabs = getCheckedTabs();
@@ -44,8 +38,8 @@ function updateSettings() {
     var tabOrder = getTabOrder();
 
     var userConfigObject = {
-        useDarkMode: $("#enableDarkMode").is(':checked'),
-        useSystemColorMode: $("#useSystemColorMode").is(':checked'),
+        useDarkMode: $('#defaultColorMode').val() == "1",
+        useSystemColorMode: $('#defaultColorMode').val() == "2",
         enableCsvImports: $("#enableCsvImports").is(':checked'),
         useMPG: $("#useMPG").is(':checked'),
         useDescending: $("#useDescending").is(':checked'),
@@ -59,6 +53,7 @@ function updateSettings() {
         enableAutoOdometerInsert: $("#enableAutoOdometerInsert").is(":checked"),
         enableAutoFillOdometer: $("#enableAutoFillOdometer").is(":checked"),
         enableShopSupplies: $("#enableShopSupplies").is(":checked"),
+        enablePersistentDialog: $("#enablePersistentDialog").is(":checked"),
         showCalendar: $("#showCalendar").is(":checked"),
         showVehicleThumbnail: $("#showVehicleThumbnail").is(":checked"),
         showSearch: $("#showGarageSearch").is(":checked"),
@@ -69,8 +64,10 @@ function updateSettings() {
         preferredGasMileageUnit: $("#preferredFuelMileageUnit").val(),
         preferredCurrencySymbol: $("#preferredCurrencySymbol").val(),
         userLanguage: $("#defaultLanguage").val(),
+        userTheme: $("#defaultTheme").val(),
         useUnitForFuelCost: $("#useUnitForFuelCost").is(":checked"),
         useGridInMobile: $("#useGridInMobile").is(":checked"),
+        enableNotesColumnWrap: $("#enableNotesColumnWrap").is(":checked"),
         visibleTabs: visibleTabs,
         defaultTab: defaultTab,
         tabOrder: tabOrder
@@ -102,6 +99,32 @@ function uploadLanguage(event) {
     sloader.show();
     $.ajax({
         url: "/Files/HandleTranslationFileUpload",
+        data: formData,
+        cache: false,
+        processData: false,
+        contentType: false,
+        type: 'POST'
+    }).done((response) => {
+        sloader.hide();
+        if (response.success) {
+            setTimeout(function () { window.location.href = '/Home/Index?tab=settings' }, 500);
+        } else {
+            errorToast(response.message);
+        }
+    }).fail(() => {
+        sloader.hide();
+        errorToast("An error has occurred, please check the file size and try again later.");
+    });
+}
+function openUploadTheme() {
+    $("#inputTheme").trigger('click');
+}
+function uploadTheme(event) {
+    let formData = new FormData();
+    formData.append("file", event.files[0]);
+    sloader.show();
+    $.ajax({
+        url: "/Files/HandleThemeFileUpload",
         data: formData,
         cache: false,
         processData: false,
@@ -482,4 +505,36 @@ function loadTooltips() {
 function setCurrencySymbol(symbol) {
     $("#preferredCurrencySymbol").val(symbol);
     updateSettings();
+}
+function handleTranslationSearchKeyPress(event) {
+    if (event.keyCode == 13) {
+        searchTranslations();
+    } else {
+        setDebounce(searchTranslations);
+    }
+}
+function searchTranslations() {
+    let searchTerm = $('#translationSearchInput').val();
+    if (searchTerm.trim() == '') {
+        $('.lubelog-translation-row').show();
+    } else {
+        $('.lubelog-translation-row').hide();
+        $(`.lubelog-translation-row span:containsNC('${searchTerm}')`).closest('.lubelog-translation-row').show();
+    }
+}
+function loadSettingsPage(pageNumber) {
+    $('[data-page-nav]').removeClass('btn-primary');
+    $('[data-page-nav]').addClass('btn-outline-primary');
+    $(`[data-page-nav="${pageNumber}"]`).removeClass('btn-outline-primary');
+    $(`[data-page-nav="${pageNumber}"]`).addClass('btn-primary');
+    $('[data-page]').hide();
+    $(`[data-page="${pageNumber}"]`).show();
+    sessionStorage.setItem('settingsSubTab', pageNumber);
+}
+function renderSettingsSubTab() {
+    let storedSubTab = sessionStorage.getItem('settingsSubTab');
+    if (storedSubTab == null || storedSubTab == undefined || $(`[data-page="${storedSubTab}"]`).length == 0) {
+        storedSubTab = 1;
+    }
+    loadSettingsPage(storedSubTab);
 }

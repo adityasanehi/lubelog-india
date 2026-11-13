@@ -28,7 +28,7 @@ namespace CarCareTracker.Filter
                     if (!permissions.Contains(_permission))
                     {
                         filterContext.Result = new JsonResult(OperationResponse.Failed("Access Denied"));
-                        filterContext.HttpContext.Response.StatusCode = 401;
+                        filterContext.HttpContext.Response.StatusCode = 403;
                     }
                 }
             }

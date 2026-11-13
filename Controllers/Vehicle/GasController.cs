@@ -16,11 +16,11 @@ namespace CarCareTracker.Controllers
             var userConfig = _config.GetUserConfig(User);
             bool useMPG = userConfig.UseMPG;
             var vehicleData = _dataAccess.GetVehicleById(vehicleId);
-            bool useUKMPG = !vehicleData.IsElectric && userConfig.UseUKMPG; //do not apply UK conversion on electric vehicles.
-            var computedResults = _gasHelper.GetGasRecordViewModels(result, useMPG, useUKMPG);
+            bool useUKMPG = userConfig.UseUKMPG;
+            var computedResults = _gasHelper.GetGasRecordViewModels(result, useMPG, useUKMPG, vehicleData.IsElectric);
             if (userConfig.UseDescending)
             {
-                computedResults = computedResults.OrderByDescending(x => DateTime.Parse(x.Date)).ThenByDescending(x => x.Mileage).ToList();
+                computedResults = computedResults.OrderByDescending(x => DateTime.Parse(x.Date)).ThenByDescending(x => x.Mileage).ThenByDescending(x=>x.EndingSoc).ToList();
             }
             var vehicleIsElectric = vehicleData.IsElectric;
             var vehicleUseHours = vehicleData.UseHours;
@@ -88,7 +88,7 @@ namespace CarCareTracker.Controllers
             //security check.
             if (!_userLogic.UserCanEditVehicle(GetUserID(), result.VehicleId, HouseholdPermission.View))
             {
-                return Redirect("/Error/Unauthorized");
+                return Forbid();
             }
             var convertedResult = new GasRecordInput
             {
@@ -101,6 +101,8 @@ namespace CarCareTracker.Controllers
                 Gallons = result.Gallons,
                 IsFillToFull = result.IsFillToFull,
                 MissedFuelUp = result.MissedFuelUp,
+                StartingSoc = result.StartingSoc,
+                EndingSoc = result.EndingSoc,
                 Notes = result.Notes,
                 Tags = result.Tags,
                 RequisitionHistory = result.RequisitionHistory,

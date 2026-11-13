@@ -3,7 +3,9 @@
     let userPassword = $("#inputUserPassword").val();
     let isPersistent = $("#inputPersistent").is(":checked");
     $.post('/Login/Login', {userName: userName, password: userPassword, isPersistent: isPersistent}, function (data) {
-        if (data) {
+        if (data.success) {
+            //set remember me setting in localStorage
+            localStorage.setItem('persistLogin', JSON.stringify(isPersistent));
             //check for redirectURL
             var redirectURL = getRedirectURL().url;
             if (redirectURL.trim() != "") {
@@ -12,9 +14,15 @@
                 window.location.href = '/Home';
             }
         } else {
-            errorToast("Invalid Login Credentials, please try again.");
+            errorToast(data.message);
         }
     })
+}
+function checkPersistLoginState() {
+    let storedPersistLogin = localStorage.getItem('persistLogin');
+    if (storedPersistLogin) {
+        $('#inputPersistent').prop('checked', JSON.parse(storedPersistLogin));
+    }
 }
 function performRegistration() {
     let token = $("#inputToken").val();

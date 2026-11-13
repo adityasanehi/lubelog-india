@@ -1,7 +1,8 @@
-using CarCareTracker.Models;
-using Microsoft.AspNetCore.Mvc;
 using CarCareTracker.Helper;
+using CarCareTracker.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace CarCareTracker.Controllers
 {
@@ -11,12 +12,14 @@ namespace CarCareTracker.Controllers
         private readonly ILogger<FilesController> _logger;
         private readonly IWebHostEnvironment _webEnv;
         private readonly IFileHelper _fileHelper;
+        private readonly FileExtensionContentTypeProvider _mimeTypeProvider;
 
         public FilesController(ILogger<FilesController> logger, IFileHelper fileHelper, IWebHostEnvironment webEnv)
         {
             _logger = logger;
             _webEnv = webEnv;
             _fileHelper = fileHelper;
+            _mimeTypeProvider = new FileExtensionContentTypeProvider();
         }
 
         [HttpPost]
@@ -25,7 +28,7 @@ namespace CarCareTracker.Controllers
             var fileName = UploadFile(file);
             return Json(fileName);
         }
-
+        [Authorize(Roles = nameof(UserData.IsRootUser))]
         [HttpPost]
         public IActionResult HandleTranslationFileUpload(IFormFile file)
         {
@@ -37,6 +40,27 @@ namespace CarCareTracker.Controllers
             var fileName = UploadFile(file);
             //move file from temp to translation folder.
             var uploadedFilePath = _fileHelper.MoveFileFromTemp(fileName, "translations/");
+            //rename uploaded file so that it preserves original name.
+            if (!string.IsNullOrWhiteSpace(uploadedFilePath))
+            {
+                var result = _fileHelper.RenameFile(uploadedFilePath, originalFileName);
+                return Json(OperationResponse.Conditional(result));
+            }
+            return Json(OperationResponse.Failed());
+        }
+        [Authorize(Roles = nameof(UserData.IsRootUser))]
+        [HttpPost]
+        public IActionResult HandleThemeFileUpload(IFormFile file)
+        {
+            //check if extension is css
+            if (Path.GetExtension(file.FileName) != ".css")
+            {
+                return Json(OperationResponse.Failed());
+            }
+            var originalFileName = Path.GetFileNameWithoutExtension(file.FileName);
+            var fileName = UploadFile(file);
+            //move file from temp to themes folder.
+            var uploadedFilePath = _fileHelper.MoveFileFromTemp(fileName, "themes/");
             //rename uploaded file so that it preserves original name.
             if (!string.IsNullOrWhiteSpace(uploadedFilePath))
             {
@@ -109,6 +133,29 @@ namespace CarCareTracker.Controllers
         {
             var viewModel = new UploadedFiles { Name = fileName, Location = fileLocation };
             return PartialView("_AttachmentPreview", viewModel);
+        }
+        [Route("/images/{fileName}")]
+        [Route("/documents/{fileName}")]
+        [Route("/translations/{fileName}")]
+        [Route("/temp/{fileName}")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetStaticFile(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return NotFound();
+            }
+            var fullFilePath = _fileHelper.GetFullFilePath(Request.Path);
+            if (!string.IsNullOrWhiteSpace(fullFilePath))
+            {
+                var fileBytes = await _fileHelper.GetFileBytesAsync(fullFilePath);
+                if (_mimeTypeProvider.TryGetContentType(fileName, out string? contentType))
+                {
+                    return File(fileBytes, contentType);
+                }
+                return File(fileBytes, "application/octet-stream");
+            }
+            return NotFound();
         }
     }
 }

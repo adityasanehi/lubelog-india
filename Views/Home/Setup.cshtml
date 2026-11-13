@@ -24,15 +24,38 @@
     </div>
 }
 @model ServerSettingsViewModel
-<div class="setup-wizard-container frosted">
-    <div class="setup-wizard-content" data-page="0">
+<div class="setup-wizard-container d-flex flex-column">
+    <div class="setup-wizard-nav" style="display:none;">
+        <div class="d-none d-md-block">
+            <div class="d-flex flex-wrap gap-2 justify-content-between p-2">
+                <div class="col-12 col-md-1 flex-grow-1 text-center break-all d-grid"><a class="btn btn-outline-primary" onclick="loadSetupPage(1)" data-page-nav="1">@translator.Translate(userLanguage, "Server Settings")</a></div>
+                <div class="col-12 col-md-1 flex-grow-1 text-center break-all d-grid"><a class="btn btn-outline-primary" onclick="loadSetupPage(2)" data-page-nav="2">@translator.Translate(userLanguage, "SMTP")</a></div>
+                <div class="col-12 col-md-1 flex-grow-1 text-center break-all d-grid"><a class="btn btn-outline-primary" onclick="loadSetupPage(3)" data-page-nav="3">@translator.Translate(userLanguage, "Server Endpoints")</a></div>
+                <div class="col-12 col-md-1 flex-grow-1 text-center break-all d-grid"><a class="btn btn-outline-primary" onclick="loadSetupPage(4)" data-page-nav="4">@translator.Translate(userLanguage, "Single Sign On")</a></div>
+                <div class="col-12 col-md-1 flex-grow-1 text-center break-all d-grid"><a class="btn btn-outline-primary" onclick="loadSetupPage(5)" data-page-nav="5">@translator.Translate(userLanguage, "Automated Events")</a></div>
+                <div class="col-12 col-md-1 flex-grow-1 text-center break-all d-grid"><a class="btn btn-outline-primary" onclick="loadSetupPage(6)" data-page-nav="6">@translator.Translate(userLanguage, "Miscellaneous")</a></div>
+            </div>
+        </div>
+        <div class="d-md-none p-2">
+            <select class="form-select" onchange="handleWizardNavBarDropDownChange()" id="setupWizardNavBarDropDown">
+                <!option value="1">@translator.Translate(userLanguage, "Server Settings")</!option>
+                <!option value="2">@translator.Translate(userLanguage, "SMTP")</!option>
+                <!option value="3">@translator.Translate(userLanguage, "Server Endpoints")</!option>
+                <!option value="4">@translator.Translate(userLanguage, "Single Sign On")</!option>
+                <!option value="5">@translator.Translate(userLanguage, "Automated Events")</!option>
+                <!option value="6">@translator.Translate(userLanguage, "Miscellaneous")</!option>
+            </select>
+        </div>
+        <hr />
+    </div>
+    <div class="setup-wizard-content flex-grow-1" data-page="0">
         <div class="d-flex text-center align-items-center justify-content-center flex-column" style="height:100%;">
             <div><span class="display-5">@translator.Translate(userLanguage, "Server Settings Configurator")</span></div>
             <div><span class="lead">@translator.Translate(userLanguage, "By proceeding, you acknowledge that you are solely responsible for all consequences from utilizing the Server Settings Configurator")</span></div>
             <div class="mt-2"><a class="btn btn-primary" onclick="nextSetupPage()">@translator.Translate(userLanguage, "Acknowledge and Continue")</a></div>
         </div>
     </div>
-    <div class="setup-wizard-content" data-page="1" style="display:none;">
+    <div class="setup-wizard-content flex-grow-1" data-page="1" style="display:none;">
         <span class="display-5">@translator.Translate(userLanguage, "Server Settings")</span>
         <hr />
         <form class="form-inline">
@@ -145,7 +168,7 @@
             </div>
         </form>
     </div>
-    <div class="setup-wizard-content" data-page="2" style="display:none;">
+    <div class="setup-wizard-content flex-grow-1" data-page="2" style="display:none;">
         <div class="d-flex justify-content-between align-items-center">
             <span class="display-5">@translator.Translate(userLanguage, "SMTP")</span>
             <div class="form-check form-switch">
@@ -187,7 +210,7 @@
             </div>
         </form>
     </div>
-    <div class="setup-wizard-content" data-page="3" style="display:none;">
+    <div class="setup-wizard-content flex-grow-1" data-page="3" style="display:none;">
         <div class="d-flex justify-content-between align-items-center">
             <span class="display-5">@translator.Translate(userLanguage, "Server Endpoints")</span>
             <div class="form-check form-switch">
@@ -224,7 +247,7 @@
             </div>
         </form>
     </div>
-    <div class="setup-wizard-content" data-page="4" style="display:none;">
+    <div class="setup-wizard-content flex-grow-1" data-page="4" style="display:none;">
         <div class="d-flex justify-content-between align-items-center">
             <span class="display-5">@translator.Translate(userLanguage, "Single Sign On")</span>
             <div class="form-check form-switch">
@@ -315,7 +338,7 @@
             </div>
         </form>
     </div>
-    <div class="setup-wizard-content" data-page="5" style="display:none;">
+    <div class="setup-wizard-content flex-grow-1" data-page="5" style="display:none;">
         <span class="display-5">@translator.Translate(userLanguage, "Automated Events")</span>
         <hr />
         <form class="form-inline">
@@ -407,7 +430,7 @@
             </div>
         </form>
     </div>
-    <div class="setup-wizard-content" data-page="6" style="display:none;">
+    <div class="setup-wizard-content flex-grow-1" data-page="6" style="display:none;">
         <span class="display-5">@translator.Translate(userLanguage, "Miscellaneous")</span>
         <hr />
         <form class="form-inline">
@@ -455,14 +478,15 @@
             </div>
         </form>
     </div>
-    <div class="setup-wizard-content" data-page="7" style="display:none;">
+    <div class="setup-wizard-content flex-grow-1" data-page="7" style="display:none;">
         <div class="d-flex text-center align-items-center justify-content-center flex-column" style="height:100%;">
             <div><span class="display-5">@translator.Translate(userLanguage, "Server Settings Saved")<span class="text-success"><i class="bi bi-check-lg"></i></span></span></div>
             <div class="mt-2"><a class="btn btn-secondary me-2" onclick="loadSetupPage(0)">@translator.Translate(userLanguage, "Restart Wizard")</a><a class="btn btn-primary" onclick="returnToGarage()">@translator.Translate(userLanguage, "Return to Garage")</a></div>
         </div>
     </div>
-    <div class="setup-wizard-nav" style="display:none;">
-        <div class="d-flex align-items-center justify-content-between pe-2" style="height:100%;">
+    <div class="setup-wizard-nav p-2" style="display:none;">
+        <hr />
+        <div class="d-flex align-items-center justify-content-between pe-2">
             <a class="btn btn-prev btn-link" onclick="previousSetupPage()">@translator.Translate(userLanguage, "Back")</a>
             <div>
                 <a class="btn btn-save btn-success" onclick="saveSetup()">@translator.Translate(userLanguage, "Save")</a>
