@@ -173,6 +173,7 @@ namespace CarCareTracker.Controllers
                     Files = input.Files,
                     Tags = string.IsNullOrWhiteSpace(input.Tags) ? new List<string>() : input.Tags.Split(' ').Distinct().ToList()
                 };
+                if (IsDryRun) return Json(OperationResponse.Succeed("Validated; no writes", new { dryRun = true }));
                 _supplyRecordDataAccess.SaveSupplyRecordToVehicle(supplyRecord);
                 _eventLogic.PublishEvent(GetUserID(), WebHookPayload.FromSupplyRecord(supplyRecord, "supplyrecord.add.api", User.Identity?.Name ?? string.Empty));
                 return Json(OperationResponse.Succeed("Supply Record Added", new { recordId = supplyRecord.Id }));
@@ -275,6 +276,8 @@ namespace CarCareTracker.Controllers
                     existingRecord.ExtraFields = input.ExtraFields;
                     existingRecord.Files = input.Files;
                     existingRecord.Tags = string.IsNullOrWhiteSpace(input.Tags) ? new List<string>() : input.Tags.Split(' ').Distinct().ToList();
+                    if (existingRecord.Quantity < 0 || existingRecord.Cost < 0) return BadRequest(OperationResponse.Failed("Remaining quantity and cost cannot be negative"));
+                    if (IsDryRun) return Json(OperationResponse.Succeed("Validated; no writes", new { dryRun = true, recordId = existingRecord.Id }));
                     _supplyRecordDataAccess.SaveSupplyRecordToVehicle(existingRecord);
                     _eventLogic.PublishEvent(GetUserID(), WebHookPayload.FromSupplyRecord(existingRecord, "supplyrecord.update.api", User.Identity?.Name ?? string.Empty));
                 }

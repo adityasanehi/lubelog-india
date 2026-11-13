@@ -42,6 +42,8 @@ namespace CarCareTracker.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IEventLogic _eventLogic;
         private readonly IDBHealthCheck _dbHealthCheck;
+        private readonly IConfiguration _configuration;
+        private readonly ILiteDBHelper _liteDB;
         public APIController(IVehicleDataAccess dataAccess,
             IGasHelper gasHelper,
             IEquipmentHelper equipmentHelper,
@@ -69,8 +71,10 @@ namespace CarCareTracker.Controllers
             IEventLogic eventLogic,
             IWebHostEnvironment webEnv,
             IHttpClientFactory httpClientFactory,
-            IDBHealthCheck dbHealthCheck)
+            IDBHealthCheck dbHealthCheck, IConfiguration configuration, ILiteDBHelper liteDB)
         {
+            _configuration = configuration;
+            _liteDB = liteDB;
             _dataAccess = dataAccess;
             _noteDataAccess = noteDataAccess;
             _serviceRecordDataAccess = serviceRecordDataAccess;
@@ -328,6 +332,7 @@ namespace CarCareTracker.Controllers
                         vehicle.IsElectric = true;
                         break;
                 }
+                if (IsDryRun) return Json(OperationResponse.Succeed("Validated; no writes", new { dryRun = true }));
                 _dataAccess.SaveVehicle(vehicle);
                 if (vehicle.Id != default)
                 {

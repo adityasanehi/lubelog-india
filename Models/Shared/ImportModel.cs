@@ -58,6 +58,9 @@ namespace CarCareTracker.Models
     }
     public class GenericRecordExportModel
     {
+        // Null preserves existing requisitions; an array appends new usage on update.
+        public List<RequisitionInput>? Requisitions { get; set; }
+        public List<SupplyUsageHistory> RequisitionHistory { get; set; } = new();
         [JsonConverter(typeof(FromIntOptional))]
         public string VehicleId { get; set; } = string.Empty;
         [JsonConverter(typeof(FromIntOptional))]
@@ -289,5 +292,13 @@ namespace CarCareTracker.Models
         public string OdometerOptional { get; set; } = string.Empty;
         public string Tags { get; set; } = string.Empty;
         public List<ExtraField> ExtraFields { get; set; } = new List<ExtraField>();
+    }
+}
+namespace CarCareTracker.Models
+{
+    public class RequisitionInput
+    {
+        public int SupplyRecordId { get; set; }
+        public decimal Quantity { get; set; }
     }
 }

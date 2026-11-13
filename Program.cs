@@ -161,7 +161,7 @@ app.UseStaticFiles();
 
 //api middleware
 app.UseWhen(
-    ctx => ctx.Request.Path.StartsWithSegments("/api") && ctx.Request.ContentType == "application/json",
+    ctx => ctx.Request.Path.StartsWithSegments("/api") && ctx.Request.HasJsonContentType(),
     ab => ab.UseMiddleware<BufferBody>()
 );
 

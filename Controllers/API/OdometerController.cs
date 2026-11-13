@@ -212,6 +212,7 @@ namespace CarCareTracker.Controllers
                     Tags = string.IsNullOrWhiteSpace(input.Tags) ? new List<string>() : input.Tags.Split(' ').Distinct().ToList(),
                     EquipmentRecordId = equipmentRecordId
                 };
+                if (IsDryRun) return Json(OperationResponse.Succeed("Validated; no writes", new { dryRun = true }));
                 _odometerRecordDataAccess.SaveOdometerRecordToVehicle(odometerRecord);
                 _eventLogic.PublishEvent(GetUserID(), WebHookPayload.FromOdometerRecord(odometerRecord, "odometerrecord.add.api", User.Identity?.Name ?? string.Empty));
                 return Json(OperationResponse.Succeed("Odometer Record Added", new { recordId = odometerRecord.Id }));

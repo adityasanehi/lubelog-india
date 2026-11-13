@@ -181,6 +181,7 @@ namespace CarCareTracker.Controllers
                     Files = input.Files,
                     Tags = string.IsNullOrWhiteSpace(input.Tags) ? new List<string>() : input.Tags.Split(' ').Distinct().ToList()
                 };
+                if (IsDryRun) return Json(OperationResponse.Succeed("Validated; no writes", new { dryRun = true }));
                 _gasRecordDataAccess.SaveGasRecordToVehicle(gasRecord);
                 if (_config.GetUserConfig(User).EnableAutoOdometerInsert)
                 {

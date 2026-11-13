@@ -48,32 +48,8 @@ namespace CarCareTracker.Controllers
                 {
                     return results;
                 }
-                var unitCost = (result.Quantity != 0) ? result.Cost / result.Quantity : 0;
-                //deduct quantity used.
-                result.Quantity -= supply.Quantity;
-                //deduct cost.
-                result.Cost -= (supply.Quantity * unitCost);
-                //check decimal places to ensure that it always has a max of 3 decimal places.
-                var roundedDecimal = decimal.Round(result.Cost, 3);
-                if (roundedDecimal != result.Cost)
-                {
-                    //Too many decimals
-                    result.Cost = roundedDecimal;
-                }
-                //create new requisitionrrecord
-                var requisitionRecord = new SupplyUsageHistory
-                {
-                    Id = supply.SupplyId,
-                    Date = dateRequisitioned,
-                    Description = usageDescription,
-                    Quantity = supply.Quantity,
-                    Cost = (supply.Quantity * unitCost)
-                };
-                result.RequisitionHistory.Add(requisitionRecord);
-                //save
+                var requisitionRecord = SupplyRequisition.Apply(result, supply.Quantity, dateRequisitioned, usageDescription);
                 _supplyRecordDataAccess.SaveSupplyRecordToVehicle(result);
-                requisitionRecord.Description = result.Description; //change the name of the description for plan/service/repair/upgrade records
-                requisitionRecord.PartNumber = result.PartNumber; //populate part number if not displayed in supplies modal.
                 results.Add(requisitionRecord);
             }
             return results;
