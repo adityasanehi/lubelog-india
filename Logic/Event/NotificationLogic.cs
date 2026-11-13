@@ -110,7 +110,7 @@ namespace CarCareTracker.Logic
                         try {
                             string backupFileLocation = _fileHelper.MakeBackup();
                             string fullExportFilePath = _fileHelper.GetFullFilePath(backupFileLocation, false);
-                            var fileContents = _fileHelper.GetFileBytes(fullExportFilePath);
+                            var fileContents = await _fileHelper.GetFileBytesAsync(fullExportFilePath);
                             var result = await _mailHelper.SendBackupEmail(Path.GetFileName(backupFileLocation), fileContents, defaultEmailAddress);
                             if (result.Success)
                             {

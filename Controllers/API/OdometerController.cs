@@ -236,7 +236,7 @@ namespace CarCareTracker.Controllers
             //security check.
             if (!_userLogic.UserCanEditVehicle(GetUserID(), existingRecord.VehicleId, HouseholdPermission.Delete))
             {
-                Response.StatusCode = 401;
+                Response.StatusCode = 403;
                 return Json(OperationResponse.Failed("Access Denied, you don't have access to this vehicle."));
             }
             var result = _odometerRecordDataAccess.DeleteOdometerRecordById(existingRecord.Id);
@@ -281,7 +281,7 @@ namespace CarCareTracker.Controllers
                     //check if user has access to the vehicleId
                     if (!_userLogic.UserCanEditVehicle(GetUserID(), existingRecord.VehicleId, HouseholdPermission.Edit))
                     {
-                        Response.StatusCode = 401;
+                        Response.StatusCode = 403;
                         return Json(OperationResponse.Failed("Access Denied, you don't have access to this vehicle."));
                     }
                     var equipmentRecordId = new List<int>();

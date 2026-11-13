@@ -336,12 +336,58 @@ function viewVehicleWithTab(vehicleIds, tab) {
         return;
     }
     let vehicleId = vehicleIds[0];
-    ViewVehicle(vehicleId, tab);
+    viewVehicle(vehicleId, tab);
+}
+function selectEveryVehicleInBetween(rowId) {
+    if (selectedVehicles.length == 0) {
+        let startVehicle = $(`[data-rowId='${rowId}'`);
+        startVehicle.addClass('garage-active');
+        addToSelectedVehicles(rowId);
+    }
+    else {
+        let lastSelectedVehicleId = selectedVehicles[0];
+        if (lastSelectedVehicleId == rowId) {
+            clearSelectedVehicles();
+            let startVehicle = $(`[data-rowId='${lastSelectedVehicleId}'`);
+            startVehicle.addClass('garage-active');
+            addToSelectedVehicles(lastSelectedVehicleId);
+            return;
+        }
+        clearSelectedVehicles();
+        let startVehicle = $(`[data-rowId='${lastSelectedVehicleId}'`);
+        startVehicle.addClass('garage-active');
+        addToSelectedVehicles(lastSelectedVehicleId);
+        let startIndex = startVehicle.index();
+        let endIndex = $(`[data-rowId='${rowId}'`).index();
+        if (startIndex > endIndex) {
+            for (let i = endIndex; i < startIndex; i++) {
+                $('.vehiclesContainer .garage-item').eq(i).map((index, elem) => {
+                    if ($(elem).is(':visible')) {
+                        $(elem).addClass('garage-active');
+                        addToSelectedVehicles($(elem).attr('data-rowId'));
+                    }
+                });
+            }
+        } else {
+            for (let i = endIndex; i > startIndex; i--) {
+                $('.vehiclesContainer .garage-item').eq(i).map((index, elem) => {
+                    if ($(elem).is(':visible')) {
+                        $(elem).addClass('garage-active');
+                        addToSelectedVehicles($(elem).attr('data-rowId'));
+                    }
+                });
+            }
+        }
+    }
 }
 function handleGarageItemClick(e, vehicleId) {
-    if (!(event.ctrlKey || event.metaKey)) {
+    if (!(event.ctrlKey || event.metaKey || event.shiftKey)) {
         viewVehicle(vehicleId);
-    } else if (!$(e).hasClass('garage-active')) {
+    }
+    else if (event.shiftKey) {
+        selectEveryVehicleInBetween($(e).attr('data-rowId'));
+    }
+    else if (!$(e).hasClass('garage-active')) {
         addToSelectedVehicles($(e).attr('data-rowId'));
         $(e).addClass('garage-active');
     } else if ($(e).hasClass('garage-active')) {
@@ -842,6 +888,7 @@ $(function () {
     loadTabFromURL();
     //bind to browser pop state
     window.addEventListener('popstate', function (event) {
+        hideActiveModal();
         loadTabFromURL();
     });
 })

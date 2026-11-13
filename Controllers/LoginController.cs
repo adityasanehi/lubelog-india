@@ -16,6 +16,7 @@ namespace CarCareTracker.Controllers
         private IDataProtector _dataProtector;
         private ILoginLogic _loginLogic;
         private IConfigHelper _config;
+        private readonly ITranslationHelper _translator;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<LoginController> _logger;
         public LoginController(
@@ -23,6 +24,7 @@ namespace CarCareTracker.Controllers
             IDataProtectionProvider securityProvider,
             ILoginLogic loginLogic,
             IConfigHelper config,
+            ITranslationHelper translator,
             IHttpClientFactory httpClientFactory
             )
         {
@@ -30,6 +32,7 @@ namespace CarCareTracker.Controllers
             _logger = logger;
             _loginLogic = loginLogic;
             _config = config;
+            _translator = translator;
             _httpClientFactory = httpClientFactory;
         }
         public IActionResult Index(string redirectURL = "", string redirectURLBase64 = "")
@@ -494,7 +497,7 @@ namespace CarCareTracker.Controllers
             if (string.IsNullOrWhiteSpace(credentials.UserName) ||
                 string.IsNullOrWhiteSpace(credentials.Password))
             {
-                return Json(false);
+                return Json(OperationResponse.Failed(_translator.Translate(_config.GetServerLanguage(), "Invalid Login Credentials")));
             }
             //compare it against hashed credentials
             try
@@ -510,7 +513,7 @@ namespace CarCareTracker.Controllers
                     var serializedCookie = JsonSerializer.Serialize(authCookie);
                     var encryptedCookie = _dataProtector.Protect(serializedCookie);
                     Response.Cookies.Append(StaticHelper.LoginCookieName, encryptedCookie, new CookieOptions { Expires = new DateTimeOffset(authCookie.ExpiresOn) });
-                    return Json(true);
+                    return Json(OperationResponse.Succeed());
                 }
                 else
                 {
@@ -536,7 +539,7 @@ namespace CarCareTracker.Controllers
             {
                 _logger.LogError(ex, "Login Error.");
             }
-            return Json(false);
+            return Json(OperationResponse.Failed(_translator.Translate(_config.GetServerLanguage(), "Invalid Login Credentials")));
         }
 
         [HttpPost]

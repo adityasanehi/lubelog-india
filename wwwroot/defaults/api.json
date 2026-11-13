@@ -54,7 +54,7 @@
             ],
             "hasBody":true,
             "bodyParamName":"input",
-            "bodySample":{
+            "bodySample":[{
                "year":2019,
                "make":"Nissan",
                "model":"Altima",
@@ -68,7 +68,7 @@
                      "value":"0000"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicles/update",
@@ -79,7 +79,7 @@
             ],
             "hasBody":true,
             "bodyParamName":"input",
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "year":2019,
                "make":"Nissan",
@@ -94,8 +94,22 @@
                      "value":"0000"
                   }
                ]
-            }
-         }
+            }]
+         },
+		 {
+			 "path":"/api/vehicles/delete",
+			 "description":"Deletes a vehicle",
+			 "methodType":3,
+			 "queryParams":[
+				{
+					"name":"id",
+					"description":"Id of the vehicle",
+					"required":true
+				}
+			 ],
+			 "hasBody":false,
+			 "bodySample":null
+		 }
       ]
    },
    {
@@ -196,7 +210,7 @@
             ],
             "hasBody":true,
             "bodyParamName":"input",
-            "bodySample":{
+            "bodySample":[{
                "date":"2026-01-03",
                "initialOdometer":15000,
                "odometer":16500,
@@ -215,7 +229,7 @@
                   }
                ],
                "equipmentRecordId":""
-            }
+            }]
          },
          {
             "path":"/api/vehicle/odometerrecords/update",
@@ -226,7 +240,7 @@
             ],
             "hasBody":true,
             "bodyParamName":"input",
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "date":"2026-01-03",
                "initialOdometer":15000,
@@ -246,7 +260,7 @@
                   }
                ],
                "equipmentRecordId":""
-            }
+            }]
          },
 		 {
             "path":"/api/vehicle/odometerrecords/recalculate",
@@ -347,7 +361,7 @@
                }
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "description":"Test Plan",
                "cost":420.69,
                "type":"ServiceRecord",
@@ -366,7 +380,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/planrecords/update",
@@ -377,7 +391,7 @@
                
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "description":"Test Plan",
                "cost":420.69,
@@ -397,7 +411,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/planrecords/delete",
@@ -494,7 +508,7 @@
                }
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "date":"2026-01-03",
                "odometer":15000,
                "description":"Test",
@@ -513,7 +527,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/servicerecords/update",
@@ -524,7 +538,7 @@
                
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "date":"2026-01-03",
                "odometer":15000,
@@ -544,7 +558,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/servicerecords/delete",
@@ -641,7 +655,7 @@
                }
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "date":"2026-01-03",
                "odometer":15000,
                "description":"Test",
@@ -660,7 +674,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/repairrecords/update",
@@ -671,7 +685,7 @@
                
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "date":"2026-01-03",
                "odometer":15000,
@@ -691,7 +705,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/repairrecords/delete",
@@ -788,7 +802,7 @@
                }
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "date":"2026-01-03",
                "odometer":15000,
                "description":"Test",
@@ -807,7 +821,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/upgraderecords/update",
@@ -818,7 +832,7 @@
                
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "date":"2026-01-03",
                "odometer":15000,
@@ -838,7 +852,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/upgraderecords/delete",
@@ -935,7 +949,7 @@
                }
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "date":"2026-01-03",
                "partNumber":"LL-12345",
                "partSupplier":"Hargata Softworks",
@@ -956,7 +970,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/supplyrecords/update",
@@ -967,7 +981,7 @@
                
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "date":"2026-01-03",
                "partNumber":"LL-12345",
@@ -989,7 +1003,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/supplyrecords/delete",
@@ -1086,7 +1100,7 @@
                }
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "date":"2026-01-03",
                "description":"Test",
                "cost":123.45,
@@ -1104,7 +1118,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/taxrecords/update",
@@ -1115,7 +1129,7 @@
                
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "date":"2026-01-03",
                "description":"Test",
@@ -1134,7 +1148,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/taxrecords/delete",
@@ -1251,7 +1265,8 @@
                }
             ],
             "hasBody":true,
-            "bodySample":{
+			"bodySampleNames":["Gas/Diesel", "EV"],
+            "bodySample":[{
                "date":"2026-01-03",
                "odometer":15000,
                "fuelConsumed":12.34,
@@ -1272,7 +1287,32 @@
                      "location":"https://lubelogger.com"
                   }
                ]
+            },
+			{
+               "date":"2026-01-03",
+               "odometer":15000,
+			   "startingSoc": 20,
+			   "endingSoc": 80,
+               "fuelConsumed":12.34,
+               "cost":123.45,
+               "isFillToFull":true,
+               "missedFuelUp":false,
+               "notes":"test",
+               "tags":"testing",
+               "extraFields":[
+                  {
+                     "name":"location",
+                     "value":"Price Utah"
+                  }
+               ],
+               "files":[
+                  {
+                     "name":"Attachment Example",
+                     "location":"https://lubelogger.com"
+                  }
+               ]
             }
+			]
          },
          {
             "path":"/api/vehicle/gasrecords/update",
@@ -1283,7 +1323,8 @@
                
             ],
             "hasBody":true,
-            "bodySample":{
+			"bodySampleNames":["Gas/Diesel", "EV"],
+            "bodySample":[{
                "id":1,
                "date":"2026-01-03",
                "odometer":15000,
@@ -1305,7 +1346,33 @@
                      "location":"https://lubelogger.com"
                   }
                ]
+            },
+			{
+			   "id": 1,
+               "date":"2026-01-03",
+               "odometer":15000,
+			   "startingSoc": 20,
+			   "endingSoc": 80,
+               "fuelConsumed":12.34,
+               "cost":123.45,
+               "isFillToFull":true,
+               "missedFuelUp":false,
+               "notes":"test",
+               "tags":"testing",
+               "extraFields":[
+                  {
+                     "name":"location",
+                     "value":"Price Utah"
+                  }
+               ],
+               "files":[
+                  {
+                     "name":"Attachment Example",
+                     "location":"https://lubelogger.com"
+                  }
+               ]
             }
+			]
          },
          {
             "path":"/api/vehicle/gasrecords/delete",
@@ -1392,14 +1459,14 @@
                }
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "description":"Test Reminder",
                "dueDate":"2024-01-04",
                "dueOdometer":15000,
                "metric":"Both",
                "notes":"test",
                "tags":"testing"
-            }
+            }]
          },
          {
             "path":"/api/vehicle/reminders/update",
@@ -1410,7 +1477,7 @@
                
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "description":"Test Reminder",
                "dueDate":"2024-01-04",
@@ -1418,7 +1485,7 @@
                "metric":"Odometer",
                "notes":"test",
                "tags":"testing"
-            }
+            }]
          },
          {
             "path":"/api/vehicle/reminders/delete",
@@ -1495,7 +1562,7 @@
                }
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "description":"Test Equipment",
                "isEquipped":true,
                "notes":"test",
@@ -1512,7 +1579,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/equipmentrecords/update",
@@ -1523,7 +1590,7 @@
                
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "description":"Test Equipment",
                "isEquipped":true,
@@ -1541,7 +1608,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/equipmentrecords/delete",
@@ -1618,7 +1685,7 @@
                }
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "description":"Note Example",
                "noteText":"Test note text added for this record",
                "pinned":false,
@@ -1635,7 +1702,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/notes/update",
@@ -1646,7 +1713,7 @@
 
             ],
             "hasBody":true,
-            "bodySample":{
+            "bodySample":[{
                "id":1,
                "description":"Note Updated Example",
                "noteText":"Test note text body update for this record",
@@ -1664,7 +1731,7 @@
                      "location":"https://lubelogger.com"
                   }
                ]
-            }
+            }]
          },
          {
             "path":"/api/vehicle/notes/delete",

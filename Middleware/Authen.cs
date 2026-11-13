@@ -40,7 +40,7 @@ namespace CarCareTracker.Middleware
                 var userIdentity = new List<Claim>
                 {
                     new(ClaimTypes.Name, "admin"),
-                    new(ClaimTypes.NameIdentifier, "-1"),
+                    new(ClaimTypes.NameIdentifier, (-1).ToString()),
                     new(ClaimTypes.Role, nameof(UserData.IsRootUser))
                 };
                 appIdentity.AddClaims(userIdentity);
@@ -212,7 +212,7 @@ namespace CarCareTracker.Middleware
                     return Task.CompletedTask;
                 }
             }
-            Response.Redirect("/Error/Unauthorized");
+            Response.Redirect("/Error/403");
             return Task.CompletedTask;
         }
     }

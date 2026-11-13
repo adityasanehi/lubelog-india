@@ -43,7 +43,7 @@ namespace CarCareTracker.Filter
                             var userId = int.Parse(filterContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
                             if (!_userLogic.UserCanEditVehicle(userId, vehicleId, _permission))
                             {
-                                filterContext.Result = _jsonResponse ? new JsonResult(OperationResponse.Failed("Access Denied")) : new RedirectResult("/Error/Unauthorized");
+                                filterContext.Result = _jsonResponse ? new JsonResult(OperationResponse.Failed("Access Denied")) : new ForbidResult();
                             }
                         }
                         else
@@ -51,18 +51,18 @@ namespace CarCareTracker.Filter
                             if (StaticHelper.IsShopSupplyEndpoint(filterContext.RouteData.Values["action"].ToString()) && !_config.GetServerEnableShopSupplies())
                             {
                                 //user trying to access shop supplies but shop supplies is not enabled by root user.
-                                filterContext.Result = _jsonResponse ? new JsonResult(OperationResponse.Failed("Access Denied")) : new RedirectResult("/Error/Unauthorized");
+                                filterContext.Result = _jsonResponse ? new JsonResult(OperationResponse.Failed("Access Denied")) : new ForbidResult();
                             }
                             else if (!StaticHelper.IsShopSupplyEndpoint(filterContext.RouteData.Values["action"].ToString()))
                             {
                                 //user trying to access any other endpoints using 0 as vehicle id.
-                                filterContext.Result = _jsonResponse ? new JsonResult(OperationResponse.Failed("Access Denied")) : new RedirectResult("/Error/Unauthorized");
+                                filterContext.Result = _jsonResponse ? new JsonResult(OperationResponse.Failed("Access Denied")) : new ForbidResult();
                             }
                         }
                     }
                 } else
                 {
-                    filterContext.Result = _jsonResponse ? new JsonResult(OperationResponse.Failed("Access Denied")) : new RedirectResult("/Error/Unauthorized");
+                    filterContext.Result = _jsonResponse ? new JsonResult(OperationResponse.Failed("Access Denied")) : new ForbidResult();
                 }
             }
         }

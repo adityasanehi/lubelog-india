@@ -24,7 +24,7 @@ function executeAPIEndpoint(sender) {
     apiResult.children('.api-tester-result-text').val('');
     try {
         //find body
-        let apiBodyElem = $(sender).closest('.form-group').children('.api-tester-body');
+        let apiBodyElem = $(sender).closest('.form-group').find('.api-tester-body:visible');
         if (apiBodyElem.length > 0) {
             if (apiBodyElem.attr('data-file') == "false") {
                 if (apiBodyElem.val().trim() == '') {

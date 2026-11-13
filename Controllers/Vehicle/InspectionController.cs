@@ -42,7 +42,7 @@ namespace CarCareTracker.Controllers
             //security check.
             if (!_userLogic.UserCanEditVehicle(GetUserID(), existingRecord.VehicleId, HouseholdPermission.View))
             {
-                return Redirect("/Error/Unauthorized");
+                return Forbid();
             }
             if (existingRecord.ReminderRecordId.Any())
             {
@@ -70,8 +70,12 @@ namespace CarCareTracker.Controllers
         {
             return PartialView("Inspection/_InspectionRecordField", new InspectionRecordTemplateField());
         }
-        public IActionResult GetAddInspectionRecordFieldOptionsPartialView()
+        public IActionResult GetAddInspectionRecordFieldOptionsPartialView(List<InspectionRecordTemplateFieldOption> currentOptions)
         {
+            if (currentOptions != null && currentOptions.Any())
+            {
+                return PartialView("Inspection/_InspectionRecordFieldOptions", currentOptions);
+            }
             return PartialView("Inspection/_InspectionRecordFieldOptions", new List<InspectionRecordTemplateFieldOption>());
         }
         public IActionResult GetAddInspectionRecordFieldOptionPartialView()

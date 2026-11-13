@@ -618,7 +618,7 @@ function updateAggregateLabels() {
         var labelsToSum = $("[data-record-type='cost']").parent(":not('.override-hide')").children("[data-record-type='cost']").toArray();
         var newSum = "0.00";
         if (labelsToSum.length > 0) {
-            newSum = labelsToSum.map(x => globalParseFloat(x.textContent)).reduce((a, b,) => a + b).toFixed(2);
+            newSum = labelsToSum.map(x => globalParseFloat(x.textContent)).reduce((a, b) => a + b).toFixed(2);
         }
         sumLabel.text(`${sumLabel.text().split(':')[0]}: ${globalAppendCurrency(globalFloatToString(newSum))}`)
     }
@@ -628,7 +628,7 @@ function updateAggregateLabels() {
         var distanceLabelsToSum = $("[data-record-type='distance']").parent(":not('.override-hide')").children("[data-record-type='distance']").toArray();
         var newDistanceSum = 0;
         if (distanceLabelsToSum.length > 0) {
-            newDistanceSum = distanceLabelsToSum.map(x => globalParseFloat(x.textContent)).reduce((a, b,) => a + b).toFixed(0);
+            newDistanceSum = distanceLabelsToSum.map(x => globalParseFloat(x.textContent)).reduce((a, b) => a + b).toFixed(0);
         }
         sumDistanceLabel.text(`${sumDistanceLabel.text().split(':')[0]}: ${newDistanceSum}`)
     }
@@ -1244,7 +1244,7 @@ function duplicateRecordsToOtherVehicles(ids, source) {
             break;
     }
 
-    $.get(`/Home/GetVehicleSelector?vehicleId=${GetVehicleId().vehicleId}`, function (data) {
+    $.get(`/Home/GetVehicleSelector?vehicleId=${GetVehicleId().vehicleId}&importMode=${source}`, function (data) {
         if (data) {
             //prompt user to select a vehicle
             Swal.fire({
@@ -1368,7 +1368,7 @@ function rangeMouseDown(e) {
     }
     var contextMenuAction = $(e.target).parents(".table-context-menu > li > .dropdown-item").length > 0 || $(e.target).is(".table-context-menu > li > .dropdown-item") || $(e.target).parents(".garage-context-menu > li > .dropdown-item").length > 0 || $(e.target).is(".garage-context-menu > li > .dropdown-item");
     var selectMode = $("#chkSelectMode").length > 0 ? $("#chkSelectMode").is(":checked") : false;
-    if (!(e.ctrlKey || e.metaKey || selectMode) && !contextMenuAction) {
+    if (!(e.ctrlKey || e.metaKey || e.shiftKey || selectMode) && !contextMenuAction) {
         clearSelectedRows();
         clearSelectedVehicles();
     }
@@ -1514,11 +1514,56 @@ function getGarageMenuPosition(mouse, direction, scrollDir) {
         position -= menu;
     return position;
 }
+function selectEveryRowInBetween(rowId) {
+    if (selectedRow.length == 0) {
+        let startRow = $(`[data-rowId='${rowId}'`);
+        startRow.addClass('table-active');
+        addToSelectedRows(rowId);
+    }
+    else {
+        let lastSelectedRowId = selectedRow[0];
+        if (lastSelectedRowId == rowId) {
+            clearSelectedRows();
+            let startRow = $(`[data-rowId='${lastSelectedRowId}'`);
+            startRow.addClass('table-active');
+            addToSelectedRows(lastSelectedRowId);
+            return;
+        }
+        clearSelectedRows();
+        let startRow = $(`[data-rowId='${lastSelectedRowId}'`);
+        startRow.addClass('table-active');
+        addToSelectedRows(lastSelectedRowId);
+        let startIndex = startRow.index();
+        let endIndex = $(`[data-rowId='${rowId}'`).index();
+        if (startIndex > endIndex) {
+            for (let i = endIndex; i < startIndex; i++) {
+                $('.vehicleDetailTabContainer .table tbody tr').eq(i).map((index, elem) => {
+                    if ($(elem).is(':visible')) {
+                        $(elem).addClass('table-active');
+                        addToSelectedRows($(elem).attr('data-rowId'));
+                    }
+                });
+            }
+        } else {
+            for (let i = endIndex; i > startIndex; i--) {
+                $('.vehicleDetailTabContainer .table tbody tr').eq(i).map((index, elem) => {
+                    if ($(elem).is(':visible')) {
+                        $(elem).addClass('table-active');
+                        addToSelectedRows($(elem).attr('data-rowId'));
+                    }
+                });
+            }
+        }
+    }
+}
 function handleTableRowClick(e, callBack, rowId) {
     var selectMode = $("#chkSelectMode").length > 0 ? $("#chkSelectMode").is(":checked") : false;
-    if (!(event.ctrlKey || event.metaKey || selectMode)) {
+    if (!(event.ctrlKey || event.metaKey || event.shiftKey || selectMode)) {
         callBack(rowId);
-    } else if (!$(e).hasClass('table-active')) {
+    } else if (event.shiftKey) {
+        selectEveryRowInBetween($(e).attr('data-rowId'));
+    }
+    else if (!$(e).hasClass('table-active')) {
         addToSelectedRows($(e).attr('data-rowId'));
         $(e).addClass('table-active');
     } else if ($(e).hasClass('table-active')) {
@@ -2148,17 +2193,17 @@ function bindTabEvents(tab) {
         case "gas-tab":
             checkQueryParams('#gasRecordModalContent', showEditGasRecordModal, 'id');
             checkQueryParams('#gasRecordModalContent', showAddGasRecordModal, 'add');
-            setupEventHub(`vehicleId_${GetVehicleId().vehicleId}`, getVehicleNotes, GetVehicleId().vehicleId);
+            setupEventHub(`vehicleId_${GetVehicleId().vehicleId}`, getVehicleGasRecords, GetVehicleId().vehicleId);
             break;
         case "accident-tab":
             checkQueryParams('#collisionRecordModalContent', showEditCollisionRecordModal, 'id');
             checkQueryParams('#collisionRecordModalContent', showAddCollisionRecordModal, 'add');
-            setupEventHub(`vehicleId_${GetVehicleId().vehicleId}`, getVehicleNotes, GetVehicleId().vehicleId);
+            setupEventHub(`vehicleId_${GetVehicleId().vehicleId}`, getVehicleCollisionRecords, GetVehicleId().vehicleId);
             break;
         case "tax-tab":
             checkQueryParams('#taxRecordModalContent', showEditTaxRecordModal, 'id');
             checkQueryParams('#taxRecordModalContent', showAddTaxRecordModal, 'add');
-            setupEventHub(`vehicleId_${GetVehicleId().vehicleId}`, getVehicleNotes, GetVehicleId().vehicleId);
+            setupEventHub(`vehicleId_${GetVehicleId().vehicleId}`, getVehicleTaxRecords, GetVehicleId().vehicleId);
             break;
         case "report-tab":
             setupEventHub(`vehicleId_${GetVehicleId().vehicleId}`, getVehicleReport, GetVehicleId().vehicleId);
@@ -2251,4 +2296,48 @@ function downloadQR() {
         downloadLink.click();
         URL.revokeObjectURL(url);
     };
+}
+
+function handleDualRangeSlider(e) {
+    let isMinSlider = $(e).attr('data-handle') == 'min';
+    let minSlider = $(e).closest('.dual-range').find('[data-handle="min"]');
+    let maxSlider = $(e).closest('.dual-range').find('[data-handle="max"]');
+    let maxRangeValue = parseInt(maxSlider.val());
+    let minRangeValue = parseInt(minSlider.val());
+    let rangePadding = 2;
+    let maxRangeLimit = maxRangeValue - rangePadding;
+    let minRangeLimit = minRangeValue + rangePadding;
+    let rangeHighlight = $(e).closest('.dual-range').find('.dual-range-highlight');
+    if (isMinSlider) {
+        if (minRangeValue >= maxRangeLimit) {
+            minSlider.val(maxRangeLimit);
+        }
+        minSlider.addClass('dual-range-top');
+        maxSlider.removeClass('dual-range-top');
+    } else {
+        if (maxRangeValue <= minRangeLimit) {
+            maxSlider.val(minRangeLimit);
+        }
+        minSlider.removeClass('dual-range-top');
+        maxSlider.addClass('dual-range-top');
+    }
+    //update range highlight
+    rangeHighlight.css('left', (minRangeValue + '%'));
+    rangeHighlight.css('width', ((maxRangeValue - minRangeValue) + '%'));
+    //update labels
+    let minRangeLabel = $(e).closest('.dual-range-container').find('[data-range-label="min"]');
+    let maxRangeLabel = $(e).closest('.dual-range-container').find('[data-range-label="max"]');
+    minRangeLabel.text(`${minSlider.val()}%`);
+    maxRangeLabel.text(`${maxSlider.val()}%`);
+}
+function removeVehicleThumbnail() {
+    uploadedFile = "";
+    $("#inputImageReplaceLabel").addClass('d-none');
+    $("#inputImageUploadLabel").removeClass('d-none');
+}
+function hideActiveModal() {
+    let activeModal = $(".modal.show");
+    if (activeModal.length > 0) {
+        activeModal.modal('hide');
+    }
 }

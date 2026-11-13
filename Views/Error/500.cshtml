@@ -1,0 +1,18 @@
+﻿@using CarCareTracker.Helper
+@inject IConfigHelper config
+@inject ITranslationHelper translator
+@{
+    var userLanguage = config.GetServerLanguage();
+}
+@{
+    ViewData["Title"] = "Internal Server Error";
+}
+<div class="no-top-pad d-flex align-items-center justify-content-center" style="height:100dvh;">
+   <div class="flex-column d-flex">
+        <span class="display-1">@translator.Translate(userLanguage, "Internal Server Error")</span>
+        <hr />
+        <div class="d-flex justify-content-center">
+            <a href="/Home" class="btn btn-outline-secondary"><i class="bi bi-car-front me-2"></i>@translator.Translate(userLanguage, "Return to Garage")</a>
+        </div>
+   </div>
+</div>

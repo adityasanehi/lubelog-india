@@ -22,8 +22,9 @@ namespace CarCareTracker.Models
         [JsonPropertyName("hasBody")]
         public bool HasBody { get; set; }
         [JsonPropertyName("bodySample")]
-        public object BodySample { get; set; } = new object();
-        public string BodySampleString { get; set; } = string.Empty;
+        public List<object> BodySample { get; set; } = new List<object>();
+        [JsonPropertyName("bodySampleNames")]
+        public List<string> BodySampleNames { get; set; } = new List<string>();
         [JsonPropertyName("bodyParamName")]
         public string BodyParamName { get; set; } = string.Empty;
         [JsonPropertyName("bodyIsFileUpload")]

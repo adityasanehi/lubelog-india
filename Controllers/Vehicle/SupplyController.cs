@@ -43,6 +43,11 @@ namespace CarCareTracker.Controllers
             {
                 //get supply record.
                 var result = _supplyRecordDataAccess.GetSupplyRecordById(supply.SupplyId);
+                //security check
+                if (result.VehicleId != default && !_userLogic.UserCanEditVehicle(GetUserID(), result.VehicleId, HouseholdPermission.Edit))
+                {
+                    return results;
+                }
                 var unitCost = (result.Quantity != 0) ? result.Cost / result.Quantity : 0;
                 //deduct quantity used.
                 result.Quantity -= supply.Quantity;
@@ -97,6 +102,10 @@ namespace CarCareTracker.Controllers
             var planRecordTemplate = _planRecordTemplateDataAccess.GetPlanRecordTemplateById(planRecordTemplateId);
             if (planRecordTemplate != default && planRecordTemplate.VehicleId != default)
             {
+                if (!_userLogic.UserCanEditVehicle(GetUserID(), planRecordTemplate.VehicleId, HouseholdPermission.View))
+                {
+                    return Json(OperationResponse.Failed("Access Denied"));
+                }
                 var supplies = _supplyRecordDataAccess.GetSupplyRecordsByVehicleId(planRecordTemplate.VehicleId);
                 if (_config.GetServerEnableShopSupplies())
                 {
@@ -180,12 +189,12 @@ namespace CarCareTracker.Controllers
                 //security check only if not editing shop supply.
                 if (!_userLogic.UserCanEditVehicle(GetUserID(), result.VehicleId, HouseholdPermission.View))
                 {
-                    return Redirect("/Error/Unauthorized");
+                    return Forbid();
                 }
             }
             else if (!_config.GetServerEnableShopSupplies())
             {
-                return Redirect("/Error/Unauthorized");
+                return Forbid();
             }
             if (result.RequisitionHistory.Any())
             {

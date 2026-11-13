@@ -6,8 +6,13 @@
     }
     determineSetupButtons();
 }
+function handleWizardNavBarDropDownChange() {
+    loadSetupPage($('#setupWizardNavBarDropDown').val());
+}
 function determineSetupButtons() {
     let currentVisiblePage = $(".setup-wizard-content:visible").attr('data-page');
+    $('[data-page-nav]').removeClass('btn-primary');
+    $('[data-page-nav]').addClass('btn-outline-primary');
     switch (currentVisiblePage) {
         case '0':
         case '7':
@@ -22,12 +27,18 @@ function determineSetupButtons() {
             $(".btn-prev").show();
             $(".btn-next").show();
             $(".btn-save").show();
+            $(`[data-page-nav=${currentVisiblePage}]`).removeClass('btn-outline-primary');
+            $(`[data-page-nav=${currentVisiblePage}]`).addClass('btn-primary');
+            $('#setupWizardNavBarDropDown').val(currentVisiblePage);
             break;
         case '6':
             $(".setup-wizard-nav").show();
             $(".btn-prev").show();
             $(".btn-next").hide();
             $(".btn-save").show();
+            $(`[data-page-nav=${currentVisiblePage}]`).removeClass('btn-outline-primary');
+            $(`[data-page-nav=${currentVisiblePage}]`).addClass('btn-primary');
+            $('#setupWizardNavBarDropDown').val(currentVisiblePage);
             break;
     }
 }

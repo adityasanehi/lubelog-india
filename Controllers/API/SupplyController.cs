@@ -199,14 +199,14 @@ namespace CarCareTracker.Controllers
             {
                 if (!_userLogic.UserCanEditVehicle(GetUserID(), existingRecord.VehicleId, HouseholdPermission.Delete))
                 {
-                    Response.StatusCode = 401;
+                    Response.StatusCode = 403;
                     return Json(OperationResponse.Failed("Access Denied, you don't have access to this vehicle."));
                 }
             }
             else if (!_config.GetServerEnableShopSupplies())
             {
                 //shop supplies not enabled
-                Response.StatusCode = 401;
+                Response.StatusCode = 403;
                 return Json(OperationResponse.Failed("Access Denied, shop supplies is not enabled."));
             }
 
@@ -255,14 +255,14 @@ namespace CarCareTracker.Controllers
                     {
                         if (!_userLogic.UserCanEditVehicle(GetUserID(), existingRecord.VehicleId, HouseholdPermission.Edit))
                         {
-                            Response.StatusCode = 401;
+                            Response.StatusCode = 403;
                             return Json(OperationResponse.Failed("Access Denied, you don't have access to this vehicle."));
                         }
                     }
                     else if (!_config.GetServerEnableShopSupplies())
                     {
                         //shop supplies not enabled
-                        Response.StatusCode = 401;
+                        Response.StatusCode = 403;
                         return Json(OperationResponse.Failed("Access Denied, shop supplies is not enabled."));
                     }
                     existingRecord.Date = DateTime.Parse(input.Date);

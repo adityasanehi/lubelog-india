@@ -54,7 +54,7 @@ namespace CarCareTracker.Controllers
             //security check.
             if (!_userLogic.UserCanEditVehicle(GetUserID(), result.VehicleId, HouseholdPermission.View))
             {
-                return Redirect("/Error/Unauthorized");
+                return Forbid();
             }
             return PartialView("Note/_NoteModal", result);
         }

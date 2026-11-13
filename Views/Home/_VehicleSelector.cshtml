@@ -15,7 +15,14 @@
             {
                 <li class="list-group-item text-start">
                     <input class="form-check-input" type="checkbox" value="@vehicle.Id" id="vehicleCheck_@vehicle.Id">
-                    <label class="form-check-label stretched-link" for="vehicleCheck_@vehicle.Id">@($"{vehicle.Year} {vehicle.Make} {vehicle.Model} ({StaticHelper.GetVehicleIdentifier(vehicle)})")</label>
+                    @if(vehicle.Id != default)
+                    {
+                        <label class="form-check-label stretched-link" for="vehicleCheck_@vehicle.Id">@($"{vehicle.Year} {vehicle.Make} {vehicle.Model} ({StaticHelper.GetVehicleIdentifier(vehicle)})")</label>
+                    } 
+                    else
+                    {
+                        <label class="form-check-label stretched-link" for="vehicleCheck_@vehicle.Id">@($"{vehicle.Make}")</label>
+                    }
                 </li>
             }
         </ul>

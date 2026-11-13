@@ -70,6 +70,7 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["POSTGRES_CONNECTION"])){
     builder.Services.AddSingleton<IInsuranceRecordDataAccess, PGInsuranceRecordDataAccess>();
     builder.Services.AddSingleton<IPUCRecordDataAccess, PGPUCRecordDataAccess>();
     builder.Services.AddSingleton<IPushSubscriptionDataAccess, PGPushSubscriptionDataAccess>();
+    builder.Services.AddSingleton<IDBHealthCheck, PGDBHealthCheck>();
 }
 else
 {
@@ -98,6 +99,7 @@ else
     builder.Services.AddSingleton<IInsuranceRecordDataAccess, InsuranceRecordDataAccess>();
     builder.Services.AddSingleton<IPUCRecordDataAccess, PUCRecordDataAccess>();
     builder.Services.AddSingleton<IPushSubscriptionDataAccess, PushSubscriptionDataAccess>();
+    builder.Services.AddSingleton<IDBHealthCheck, DBHealthCheck>();
 }
 
 //configure helpers
@@ -151,70 +153,11 @@ builder.Services.Configure<FormOptions>(options =>
 var app = builder.Build();
 
 //configure the HTTP request pipeline.
-app.UseExceptionHandler("/Home/Error");
+app.UseExceptionHandler("/Error");
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 //static file security
 app.UseStaticFiles();
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-           Path.Combine(builder.Environment.ContentRootPath, "data", "images")),
-    RequestPath = "/images",
-    OnPrepareResponse = ctx =>
-    {
-        if (ctx.Context.Request.Path.StartsWithSegments("/images"))
-        {
-            ctx.Context.Response.Headers.Append("Cache-Control", "no-store");
-            var userIsAuthenticated = ctx.Context.User.Identity?.IsAuthenticated ?? false;
-            if (!userIsAuthenticated)
-            {
-                ctx.Context.Response.Redirect("/Login");
-            }
-        }
-    }
-});
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-           Path.Combine(builder.Environment.ContentRootPath, "data", "documents")),
-    RequestPath = "/documents",
-    OnPrepareResponse = ctx =>
-    {
-        if (ctx.Context.Request.Path.StartsWithSegments("/documents"))
-        {
-            ctx.Context.Response.Headers.Append("Cache-Control", "no-store");
-            var userIsAuthenticated = ctx.Context.User.Identity?.IsAuthenticated ?? false;
-            if (!userIsAuthenticated)
-            {
-                ctx.Context.Response.Redirect("/Login");
-            }
-        }
-    }
-});
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-           Path.Combine(builder.Environment.ContentRootPath, "data", "translations")),
-    RequestPath = "/translations"
-});
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-           Path.Combine(builder.Environment.ContentRootPath, "data", "temp")),
-    RequestPath = "/temp",
-    OnPrepareResponse = ctx =>
-    {
-        if (ctx.Context.Request.Path.StartsWithSegments("/temp"))
-        {
-            ctx.Context.Response.Headers.Append("Cache-Control", "no-store");
-            var userIsAuthenticated = ctx.Context.User.Identity?.IsAuthenticated ?? false;
-            if (!userIsAuthenticated)
-            {
-                ctx.Context.Response.Redirect("/Login");
-            }
-        }
-    }
-});
 
 //api middleware
 app.UseWhen(

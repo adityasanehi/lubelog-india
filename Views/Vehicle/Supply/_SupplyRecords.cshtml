@@ -13,6 +13,8 @@
         extraFields = Model.SelectMany(x => x.ExtraFields).Select(y => y.Name).Distinct().ToList();
     }
     var userColumnPreferences = userConfig.UserColumnPreferences.Where(x => x.Tab == ImportMode.SupplyRecord);
+    var noteColumnStyle = userConfig.EnableNotesColumnWrap ? "text-wrap break-all" : "text-truncate";
+    var noteColumnLength = userConfig.EnableNotesColumnWrap ? 100 : 25;
 }
 @model List<SupplyRecord>
 <div class="d-flex flex-column vehicleTabPane">
@@ -52,6 +54,26 @@
                             <div class="list-group-item">
                                 <input class="btn-check" type="checkbox" id="chkSelectMode" onchange="checkSelectModeToggle()">
                                 <label class="dropdown-item" for="chkSelectMode">@translator.Translate(userLanguage, "Select Mode")</label>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">@translator.Translate(userLanguage, "Filter Supplies")</h6></li>
+                        <li>
+                            <div class="list-group-item">
+                                <input class="btn-check" type="checkbox" id="chkAllSupplies" onchange="checkSupplyFilterToggle(this)" checked data-filter="all">
+                                <label class="dropdown-item" for="chkAllSupplies">@translator.Translate(userLanguage, "All Supplies")</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="list-group-item">
+                                <input class="btn-check" type="checkbox" id="chkAvailableSupplies" onchange="checkSupplyFilterToggle(this)" data-filter="available">
+                                <label class="dropdown-item" for="chkAvailableSupplies">@translator.Translate(userLanguage, "Available Supplies")</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="list-group-item">
+                                <input class="btn-check" type="checkbox" id="chkDepletedSupplies" onchange="checkSupplyFilterToggle(this)" data-filter="depleted">
+                                <label class="dropdown-item" for="chkDepletedSupplies">@translator.Translate(userLanguage, "Depleted Supplies")</label>
                             </div>
                         </li>
                         <li><hr class="dropdown-divider"></li>
@@ -154,7 +176,7 @@
                             <td data-label="@translator.Translate(userLanguage, "Quantity")" class="col-1 flex-grow-1 flex-shrink-1 text-truncate" data-column="quantity">@supplyRecord.Quantity</td>
                             <td data-label="@translator.Translate(userLanguage, "Cost")" class="col-1 flex-grow-1 flex-shrink-1 text-truncate" data-column="cost" data-record-type="cost">@(StaticHelper.HideZeroCost(supplyRecord.Cost, hideZero))</td>
                             <td data-label="@translator.Translate(userLanguage, "Attachments")" class="col-1 flex-grow-1 flex-shrink-1 text-truncate" style='display:none;' data-column="attachments">@await Html.PartialAsync("_AttachmentColumn", supplyRecord.Files)</td>
-                            <td data-label="@translator.Translate(userLanguage, "Notes")" class="col-2 flex-grow-1 flex-shrink-1 text-truncate" data-column="notes">@StaticHelper.TruncateStrings(supplyRecord.Notes)</td>
+                            <td data-label="@translator.Translate(userLanguage, "Notes")" class="col-2 flex-grow-1 flex-shrink-1 @noteColumnStyle" data-column="notes">@StaticHelper.TruncateStrings(supplyRecord.Notes, noteColumnLength)</td>
                         @foreach (string extraFieldColumn in extraFields)
                         {
                                 <td data-label="@extraFieldColumn" class="col-2 flex-grow-1 flex-shrink-1 text-truncate" style='display:none;' data-column="@extraFieldColumn">
@@ -197,7 +219,7 @@
 </div>
 </div>
 
-<div class="modal fade" data-bs-focus="false" id="supplyRecordModal" tabindex="-1" role="dialog" aria-hidden="true" onpaste="handleModalPaste(event)">
+<div class="modal fade" data-bs-focus="false" id="supplyRecordModal" tabindex="-1" role="dialog" aria-hidden="true" onpaste="handleModalPaste(event)" @StaticHelper.GetStaticModalAttribute(userConfig.EnablePersistentDialog)>
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content" id="supplyRecordModalContent">
         </div>

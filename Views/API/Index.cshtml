@@ -1,4 +1,5 @@
-﻿@using CarCareTracker.Helper
+﻿@using System.Text.Json
+@using CarCareTracker.Helper
 @{
     ViewData["Title"] = "API";
 }
@@ -70,8 +71,26 @@
                                         }
                                         @if (apiMethod.HasBody && !apiMethod.BodyIsFileUpload)
                                         {
+                                            var bodyId = $"g{Guid.NewGuid().ToString().Substring(0,8)}";
                                             <label>@translator.Translate(userLanguage, "Body Sample")</label>
-                                            <textarea class="form-control api-tester-body" data-file="false" data-param="@apiMethod.BodyParamName" rows="5">@apiMethod.BodySampleString</textarea>
+                                            <ul class="nav nav-pills mt-2 mb-2 @(apiMethod.BodySample.Count() == 1 ? "d-none" : "")">
+                                                @for (int i = 0; i < apiMethod.BodySample.Count(); i++)
+                                                {
+                                                    var bodySampleName = apiMethod.BodySampleNames.ElementAtOrDefault(i) ?? $"Body Sample {i + 1}";
+                                                    <li class="nav-item" role="presentation">
+                                                        <button class="nav-link @(i == 0 ? "active" : "")" data-bs-toggle="pill" data-bs-target="@($"#{bodyId}-{i}-tab-pane")" type="button" role="tab" aria-selected="false">@bodySampleName</button>
+                                                    </li>
+                                                }
+                                            </ul>
+                                            <div class="tab-content">
+                                                @for(int i = 0; i < apiMethod.BodySample.Count(); i++)
+                                                {
+                                                    var bodySampleString = JsonSerializer.Serialize(apiMethod.BodySample[i], StaticHelper.GetAPIDocumentationSerializerOption());
+                                                    <div class="tab-pane fade @(i == 0 ? "show active" : "")" id="@($"{bodyId}-{i}-tab-pane")" role="tabpanel">
+                                                        <textarea class="form-control api-tester-body" data-file="false" data-param="@apiMethod.BodyParamName" rows="5">@bodySampleString</textarea>
+                                                    </div>
+                                                }
+                                            </div>
                                         } 
                                         else if (apiMethod.BodyIsFileUpload)
                                         {

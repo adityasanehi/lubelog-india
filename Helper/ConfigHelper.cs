@@ -28,6 +28,7 @@ namespace CarCareTracker.Helper
         string GetLogoUrl();
         string GetSmallLogoUrl();
         string GetServerLanguage();
+        string GetServerTheme();
         bool GetServerDisabledRegistration();
         bool GetServerEnableShopSupplies();
         bool GetServerAuthEnabled();
@@ -216,6 +217,11 @@ namespace CarCareTracker.Helper
         {
             var serverLanguage = CheckString(nameof(UserConfig.UserLanguage), "en_US");
             return serverLanguage;
+        }
+        public string GetServerTheme()
+        {
+            var serverTheme = CheckString(nameof(UserConfig.UserTheme));
+            return serverTheme;
         }
         public bool GetServerDisabledRegistration()
         {
@@ -476,6 +482,7 @@ namespace CarCareTracker.Helper
                 PreferredGasUnit = CheckString(nameof(UserConfig.PreferredGasUnit)),
                 UseUnitForFuelCost = CheckBool(CheckString(nameof(UserConfig.UseUnitForFuelCost))),
                 UserLanguage = CheckString(nameof(UserConfig.UserLanguage), "en_US"),
+                UserTheme = CheckString(nameof(UserConfig.UserTheme)),
                 HideSoldVehicles = CheckBool(CheckString(nameof(UserConfig.HideSoldVehicles))),
                 EnableShopSupplies = CheckBool(CheckString(nameof(UserConfig.EnableShopSupplies))),
                 ShowCalendar = CheckBool(CheckString(nameof(UserConfig.ShowCalendar))),
@@ -487,7 +494,9 @@ namespace CarCareTracker.Helper
                 ShowVehicleThumbnail = CheckBool(CheckString(nameof(UserConfig.ShowVehicleThumbnail))),
                 ShowSearch = CheckBool(CheckString(nameof(UserConfig.ShowSearch))),
                 DisableAutoZoom = CheckBool(CheckString(nameof(UserConfig.DisableAutoZoom))),
-                UseGridInMobile = CheckBool(CheckString(nameof(UserConfig.UseGridInMobile)))
+                EnablePersistentDialog = CheckBool(CheckString(nameof(UserConfig.EnablePersistentDialog))),
+                UseGridInMobile = CheckBool(CheckString(nameof(UserConfig.UseGridInMobile))),
+                EnableNotesColumnWrap = CheckBool(CheckString(nameof(UserConfig.EnableNotesColumnWrap)))
             };
             int userId = 0;
             if (user != null)
